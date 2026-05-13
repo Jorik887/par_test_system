@@ -59,8 +59,6 @@ cd d:\par-test-automation-system\desktop-installer
 
 - `desktop-installer\dist-installer\ParagraphTestSystemDesktop-Setup.exe`
 
-## Какой файл передавать тестировщику (бета)
-
 Передавать нужно:
 
 - `ParagraphTestSystemDesktop-Setup.exe`
