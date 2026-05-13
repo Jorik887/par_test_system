@@ -1,0 +1,44 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Report.proto";
+import "Ai_Common.proto";
+
+// Отправка сообщение
+message TextMessageRequest {
+	enum MsgType {
+		PERSONAL = 1; // личное сообщение
+		GLOBAL   = 2; // сообщение отправляется всем пользователям
+	}
+
+	required UUID id         = 1;   // идентификатор сообщения
+	required UserId sender   = 2;   // отправитель сообщения
+	required UserId receiver = 3;   // получатель сообщения
+	required SystemTime time = 4;   // время отправки сообщения
+	repeated FileInfo files  = 5;   // приложенные файлы
+
+	required MsgType type    = 9;   // тип сообщения
+
+	optional bytes data      = 10;  // сообщение
+}
+
+// Ответ на сообщение
+message TextMessageResponse {
+	required UUID id              = 1; // идентификатор сообщения
+	required Report report        = 2; // отчет о доставке
+	optional bool system_response = 3; // показывает, что данное сообщение прислала УШД
+}
+
+// Состояние сообщения
+enum TextMessageState {
+	READ   =  1;		// прочитано
+	REMOVED = 2;		// удалено
+}
+
+// Изменение состояния сообщения
+message TextMessageNotification {
+	required UUID id 				= 1;   // идетификатор сообщения
+	required TextMessageState state = 2;   // текущее состояние сообщения
+	required SystemTime time 		= 3;   // время изменения состояния
+	required UserId receiver 		= 4;   // получатель сообщения
+}

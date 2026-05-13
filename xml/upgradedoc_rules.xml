@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="Набор правил для расчета документов" alias="upgradedoc_rules"  module="paragraf">
+	<binary_param alias="file" name="Сериализованное значение набора правил"/>
+</document>

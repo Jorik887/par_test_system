@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Служебные" type="Запрос документов" alias="query_docs">
+
+	<group name="Версия запроса" alias="version">
+		<spin_box alias="major_version" type="uint" min="0" max="4294967295" name="Мажорная версия">3</spin_box>
+		<spin_box alias="minor_version" type="uint" min="0" max="4294967295" name="Минорная версия">2</spin_box>
+	</group>
+
+<repeater alias="filter">
+	<combo_box name="Фильтрация по" alias="param_type">
+		<item>Идентификатор задачи</item>
+		<item>Идентификатор документа</item>
+		<item>Порядковый номер документа</item>
+		<item>Дата создания</item>
+		<item>Тип документа</item>
+		<item>Тег документа</item>
+		<item>Частота</item>
+		<item>Координата</item>
+		<item>Текст</item>
+		<item>Целое число</item>
+		<item>Дробное число</item>
+		<item>Логический тип</item>
+	</combo_box>
+	<text_field name="Наименование поля" alias="parameter_name"></text_field>
+	<text_field name = "Псевдоним поля" alias="parametr_alias"></text_field>
+	<combo_box alias="condition">
+		<item>Равно</item>
+		<item>Не равно</item>
+		<item>Больше</item>
+		<item>Не больше</item>
+		<item>Меньше</item>
+		<item>Не меньше</item>
+		<item>Содержит (с учётом регистра)</item>
+		<item>Содержит (без учёта регистра)</item>
+		<item>Не содержит (с учётом регистра)</item>
+		<item>Не содержит (без учёта регистра)</item>
+	</combo_box>
+	<group alias="value">
+		<text_field name = "Текстовое значение" alias="text_val"/>
+		<date name = "Дата" alias="date_val"/>
+		<spin_box name = "Числовое значение" alias="spinbox_val" type="uint" min="0" max="4294967295"/>
+		<spin_box name = "Дробное значение" alias="spinbox_doubleval" type="double"/>
+		<coordinates name = "Координата" type="poi" alias="coordinates_val"/>
+		<frequency name="Частота" alias="frequency_val" type="MHz" precision="6" float="true" max="999999999"/>
+		<check_box name="Логическое значение" alias="check_val" checked="false"></check_box>
+	</group>
+	<spin_box name = "Номер фильтра" alias="filter_num" type="uint" min="0" max="4294967295"/>
+</repeater>
+
+<repeater alias="group_filter">
+
+	<combo_box name="Условие связи фильтров" alias="condition_connect">
+		<item>И</item>
+		<item>ИЛИ</item>
+	</combo_box>
+	
+	<repeater alias="group_filter_item">
+		<spin_box name = "Номер фильтра для добавления" alias="nested_filter_num" type="uint" min="0" max="4294967295"/>
+	</repeater>
+
+	<spin_box name = "Номер фильтра" alias="filter_num" type="uint" min="0" max="4294967295"/>
+</repeater>
+
+	<combo_box alias="docs_order" name="Порядок выбора">
+        <item>С начала</item>
+    	<item>С конца</item>
+     </combo_box>
+	 
+	<repeater alias="docs_executer" name="Участники документооборота">
+		<text_field name="Идентификатор пользователя" alias="doc_executer_id" />
+		<text_field name="Идентификатор ПО" alias="doc_executer_hostid" />
+		<combo_box name="Тип участника" alias="docs_executer_type">
+			<item>author</item> 
+			<item>executer</item>
+		</combo_box>
+	</repeater>
+	
+	<!-- Ограничить выбор количеством документов -->
+	<spin_box alias="docs_limit" max="1000" min="1" name="Ограничение вывода" type="uint" uitype="spinbox"/>
+	<check_box alias="send_files" checked="false" name="Отправлять файлы"></check_box>
+
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<!-- При успешном выборе в ответ приходит оцениваемое количество документов, содержащихся в базе по заданному запросу. -->
+			<spin_box alias="complete_count" max="1000" min="1" name="Количество документов" type="uint" uitype="spinbox"/>
+			<repeater alias="documents" name="Документы">
+				<text_field alias="id_doc" name="Идентификатор документа в БД"/>
+				<spin_box alias="doc_number" type="uint" min="0" max="4294967295" name="Порядковый номер документа в БД"/>
+				<document_param alias="doc"/>
+				<input_file multiple="true" alias="doc_files"/>
+			</repeater>
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>

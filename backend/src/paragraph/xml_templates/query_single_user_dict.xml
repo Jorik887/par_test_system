@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Пользовательские справочники" type="Поиск в пользовательском справочнике" alias="search_single_user_dict">
+
+	<text_field name="Название справочника" alias="user_table_name" required="true" />
+	
+	<repeater alias="table_filters" name="Значения">
+		<text_field name="Поле" alias="column"></text_field>
+		<text_field name="Значение" alias="column_value"></text_field>
+	</repeater>
+	
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<repeater alias="user_tables" name="Cправочники">
+
+			</repeater>
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>
+

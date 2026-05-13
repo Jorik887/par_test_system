@@ -1,0 +1,93 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Icons.proto";
+import "Ai_Report.proto";
+
+// Состояние поста отображется на ГИП Интегратора в виде карточки поста.
+// Присылаемое состояние должно соответсвовать типу карточки.
+// Более подробно смотрите в документации. Там представлен внешний вид кароточек и даны детальные описания, какой элемент отображения какому полю соответствует.
+
+// Типы состояний, соответствующие типам карточек
+// Пока единственный тип, потом их количество будет увеличено
+enum StateType {
+	ST_UNKNOWN = 1;
+	ST_SIMPLE  = 2;  // Простой тип.
+	ST_HOST    = 3;  // Отображение статусов другого интегратора
+	ST_LIST    = 4;  // Список статусов, отображается в виде таблицы
+}
+
+// Статусы режима работы
+// Пост может быть запущен в одном из режимов работы
+// Статусы режима работы отражают текущее состояние работы поста
+enum PostModeStatus {
+	PM_IDLE     = 1;  // Пост остановлен. На UI кнопка запуска режима принимает вид "Запустить"
+	PM_STARTING = 2;  // Пост запускается для работы в заданном режиме
+	PM_RUN      = 3;  // Пост работает в указанном режиме
+	PM_STOPPING = 4;  // Пост останавливает работу в указанном режиме
+	PM_NONE     = 5;  // Статус режима не используется. Кнопка запуска режима не будет отображаться на GUI
+}
+
+// Параметры режима работы
+message WorkMode {
+	required string id   = 1; // Идентификатор режима (регистр игнорируется)
+	required string name = 2; // Название режима работы
+}
+
+// Состояние поста, соответствующее простой стандартной карточке
+message SimpleState {
+	required StatusIcon      main_status         = 1; // Основной статус
+	repeated StatusIcon      additional_statuses = 2; // Дополнительные статусы, количество [0..9]
+	repeated string          text_statuses       = 3; // Текстовые статусы, количество [0..5]
+	optional string          current_mode_id     = 4; // Индекс текущего установленного режима работы. Должен быть установлен, если в конфигурационном файле задано более одного режима
+	optional PostModeStatus  mode_status         = 5; // Статус режима работы
+	repeated WorkMode        work_modes          = 6; // Список режимов работы. Если задан, список из конфигурационного файла игнорируется
+}
+
+// Состояние поста, соответствующее карточке отображения другого инегратора
+message HostState {
+	required StatusIcon      main_status         = 1; // Основной статус
+	repeated StatusIcon      additional_statuses = 2; // Дополнительные статусы, количество [0..9]
+	repeated string          text_statuses       = 3; // Текстовые статусы, количество [0..5]
+}
+
+// Строка таблицы. Может быть заполнен либо один элемент либо оба
+message ListItem {
+	optional StatusIcon icon        = 3;  // иконка
+	optional string     text        = 4;  // текст
+}
+
+// Описание таблицы
+message LegendItem {
+	required StatusIcon icon = 1; // иконка
+	required string     text = 2; // статусная информация
+}
+
+// Состояние поста, соответствующее карточке со списком
+message ListState {
+	optional IconColor  main_color  = 1; // Цвет основного статуса
+	optional string     main_status = 2; // Основной статус
+	repeated ListItem   items       = 3; // Элементы списка
+	repeated LegendItem legend      = 4; // Описание таблицы
+	optional int32 itemsIconSize    = 5; // Размер иконок для списка, диапазон [10;20]
+	optional int32 legendIconSize   = 6; // Размер иконок для описания, диапазон [10;20]
+}
+
+// Состояние поста
+message PostState {
+	required string          card_id             = 1; // Идентификатор карточки поста, на который будет выводиться статусная информация. Настраивается в конфигурационном файле запускаемого модуля
+	required StateType       type                = 2; // Тип состояния, соответствующий карточке отображения
+	optional SimpleState     simple_state        = 3; // Должно быть заполнено, если type == ST_SIMPLE
+	optional HostState       host_state          = 4; // Должно быть заполнено, если type == ST_HOST
+	optional ListState       list_state          = 5; // Должно быть заполнено, если type == ST_LIST
+}
+
+// Отправка состояния поста
+message SetPostStateRequest {
+	required PostState       post_state          = 1; // Состояние поста
+}
+
+// Ответ на отправку состояния поста
+message SetPostStateResponse {
+	required Report          report              = 1; // Отчет о выполнении
+}

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="Данные файла ТХТ"  group="Служебные" alias="txt_default_file">
+	<text_field  name="Наименование файла" alias="filename"/>
+	<text_field  name="Текстовое сообщение" alias="text" multiline="true" />
+</document>

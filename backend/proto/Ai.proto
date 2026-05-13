@@ -1,0 +1,135 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Control.proto";
+import "Ai_Handshake.proto";
+import "Ai_PostParameters.proto";
+import "Ai_PostState.proto";
+import "Ai_Documents.proto";
+import "Ai_NetworkInfo.proto";
+import "Ai_TextMessage.proto";
+import "Ai_ModuleLaunch.proto";
+import "Ai_StopAction.proto";
+import "Ai_OrgStructure.proto";
+import "Ai_FacilityStructure.proto";
+
+message HostMessage {
+	enum MsgType {
+		HANDSHAKE_REQUEST      	= 10;
+		HANDSHAKE_RESPONSE     	= 11;
+
+		LOGIN_NOTIFICATION     	= 12;
+        LOGIN_REQUEST           = 13;
+        LOGIN_RESPONSE          = 14;
+
+		// Следующие команды будут убраны в ближайших релизах
+		SET_PARAMETERS_REQUEST 	= 20;	// deprecated
+		SET_PARAMETERS_RESPONSE	= 21;	// deprecated
+		SET_STATE_REQUEST      	= 30;	// deprecated
+		SET_STATE_RESPONSE     	= 31;	// deprecated
+		SET_WORK_MODE_REQUEST  	= 40;	// deprecated
+		SET_WORK_MODE_RESPONSE 	= 41;	// deprecated
+		CONTROL_ACTION_REQUEST 	= 50;	// deprecated
+		CONTROL_ACTION_RESPONSE	= 51;	// deprecated
+
+		// Электронный документооборот
+		EDM_MESSAGE				= 60;
+
+		// Список модулей на уровне оборудования
+		MODULE_LIST_REQUEST     = 71;
+		MODULE_LIST_RESPONSE    = 72;
+		MODULE_LIST_INDICATION  = 73;
+
+		// Список пользователей
+		USER_LIST_REQUEST       = 74;
+		USER_LIST_RESPONSE      = 75;
+		USER_LIST_INDICATION    = 76;
+
+		// Отправка текстовых сообщений
+		TEXT_MESSAGE_REQUEST    = 80;
+		TEXT_MESSAGE_RESPONSE   = 81;
+		TEXT_MESSAGE_NOTIFICATION = 79;
+
+		// Запуск удаленного модуля (используется софтом управления)
+		MODULE_LAUNCH_REQUEST   = 82;
+		MODULE_LAUNCH_RESPONSE  = 83;
+
+		// Команда остановки модуля. Инициатор - УШД, получатель - подключаемое СПО
+		STOP_ACTION_REQUEST     = 84;
+		STOP_ACTION_RESPONSE    = 85;
+
+		// Остановка удаленного модуля (используется софтом управления)
+		MODULE_STOP_REQUEST   = 86;
+		MODULE_STOP_RESPONSE  = 87;
+
+		MODULE_LAUNCH_RESULT 	= 88;
+		MODULE_STOP_RESULT	= 89;
+        MODULE_STATUS_INDICATION= 90;
+
+        // Запрос ОШС
+        ORGANIZATION_REQUEST = 100;
+        ORGANIZATION_RESPONSE = 101;
+        ORGANIZATION_INDICATION = 102;
+
+        // Запрос КАПС (описание комплекса)
+        FACILITY_REQUEST = 110;
+        FACILITY_RESPONSE = 111;
+        FACILITY_INDICATION = 112;
+	}
+
+	required MsgType type = 1;
+	required uint32 id    = 2;  // Ссылочный идентификатор запроса/ответа (id ответа должно быть равно id присланного запроса)
+
+	optional HandshakeRequest  handshake_request            = 10; // HANDSHAKE_REQUEST
+	optional HandshakeResponse handshake_response           = 11; // HANDSHAKE_RESPONSE
+
+	optional LoginNotification login_notification           = 12; // LOGIN_NOTIFICATION
+
+	optional LoginNodusRequest   login_request              = 13; // LOGIN_REQUEST
+	optional LoginNodusResponse  login_response             = 14; // LOGIN_RESPONSE
+
+	optional EdmMessage  edm_message                        = 60; // EDM_MESSAGE
+
+	optional ModuleListRequest module_list_request          = 71; // MODULE_LIST_REQUEST
+	optional ModuleListResponse module_list_response        = 72; // MODULE_LIST_RESPONSE
+	optional ModuleListIndication module_list_indication    = 73; // MODULE_LIST_INDICATION
+
+	optional UserListRequest user_list_request              = 74; // USER_LIST_REQUEST
+	optional UserListResponse user_list_response            = 75; // USER_LIST_RESPONSE
+	optional UserListIndication user_list_indication        = 76; // USER_LIST_INDICATION
+
+	optional TextMessageRequest text_message_request        = 80; // TEXT_MESSAGE_REQUEST
+	optional TextMessageResponse text_message_response      = 81; // TEXT_MESSAGE_RESPONSE
+	optional TextMessageNotification text_message_notification = 79; // TEXT_MESSAGE_NOTIFICATION
+
+	optional ModuleLaunchRequest module_launch_request      = 82; // MODULE_LAUNCH_REQUEST
+	optional ModuleLaunchResponse module_launch_response    = 83; // MODULE_LAUNCH_RESPONSE
+
+	optional StopActionRequest stop_action_request          = 84; // STOP_ACTION_REQUEST
+	optional StopActionResponse stop_action_response        = 85; // STOP_ACTION_RESPONSE
+
+	optional ModuleStopRequest module_stop_request      	= 86; // MODULE_STOP_REQUEST
+	optional ModuleStopResponse module_stop_response    	= 87; // MODULE_STOP_RESPONSE
+
+	optional ModuleLaunchResult module_launch_result	= 88; // MODULE_LAUNCH_RESULT
+	optional ModuleStopResult module_stop_result		= 89; // MODULE_STOP_RESULT
+    optional ModuleStatusIndication module_status_indication= 90; // MODULE_STATUS_INDICATION
+
+    optional organization.OrganizationRequest organization_request = 100;
+    optional organization.OrganizationResponse organization_response = 101;
+    optional organization.OrganizationIndication organization_indication = 102;
+
+    optional facility.FacilityRequest facility_request = 110;
+    optional facility.FacilityResponse facility_response = 111;
+    optional facility.FacilityIndication facility_indication = 112;
+
+	// deprecated
+	optional SetParametersRequest  set_parameters_request   = 20;  // SET_PARAMETERS_REQUEST
+	optional SetParametersResponse set_parameters_response  = 21;  // SET_PARAMETERS_RESPONSE
+	optional SetPostStateRequest  set_state_request         = 30;  // SET_STATE_REQUEST
+	optional SetPostStateResponse set_state_response        = 31;  // SET_STATE_RESPONSE
+	optional SetWorkModeRequest  set_work_mode_request      = 40;  // SET_WORK_MODE_REQUEST
+	optional SetWorkModeResponse set_work_mode_response     = 41;  // SET_WORK_MODE_RESPONSE
+	optional ControlActionRequest  control_action_request   = 50;  // CONTROL_ACTION_REQUEST
+	optional ControlActionResponse control_action_response  = 51; // CONTROL_ACTION_RESPONSE
+}

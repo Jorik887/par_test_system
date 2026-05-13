@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="Набор правил для фильтрации на удаленной базе данных" alias="composite_query_docs">
+	<binary_param alias="composite_filter" name="Сериализованный фильтр"/>
+	
+	<!-- Ограничить выбор количеством документов -->
+	<spin_box alias="docs_limit" max="4294967295" min="1" name="Ограничение вывода" type="uint" uitype="spinbox"/>
+	<check_box alias="send_files" checked="false" name="Отправлять с файлами"></check_box>
+	
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<!-- При успешном выборе в ответ приходит оцениваемое количество документов, содержащихся в базе по заданному запросу. -->
+			<spin_box alias="complete_count" max="4294967295" min="0" name="Количество документов" type="uint" uitype="spinbox"/>
+			<repeater alias="documents" name="Документы">
+				<document_param alias="document"/>
+				<repeater alias="binary_meta" name="Мета информация о BP файлах">
+					<text_field alias="id" name="Идентификатор файла"/>
+					<text_field alias="name" name="Название файла"/>
+					<spin_box alias="type" max="4294967295" min="0" name="Тип файла" type="uint" uitype="spinbox"/>
+					<spin_box alias="hash" max="4294967295" min="0" name="Хеш параметра" type="uint" uitype="spinbox"/>
+					<spin_box alias="size" max="4294967295" min="0" name="Размер файла в байтах" type="uint" uitype="spinbox"/>
+					<text_field alias="datetime" name="Дата создания"/>
+				</repeater>
+			</repeater>
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>
+

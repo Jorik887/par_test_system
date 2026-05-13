@@ -1,0 +1,39 @@
+syntax="proto2";
+package ai.proto;
+
+// Передача двоичных данных в параметре
+message BinaryDataParameter {
+    required bytes data = 1; // бинарные данные (ограничения: не больше 50мб)
+    optional string filename = 2; // имя файла
+    optional TypeBinaryData type = 3; // тип бинарных данных
+    optional string description = 4; // описание
+// тип бинарных данных
+enum TypeBinaryData {
+// audio
+        WAV     = 1;
+        MP3     = 2;
+        FLAC    = 3;
+// video
+        AVI     = 20;
+        MP4     = 21;
+// picture
+        BMP     = 40;
+        JPEG    = 41;
+        JPG     = 42;
+        GIF     = 43;
+        TIFF    = 44;
+	PNG     = 45;
+// document
+        DOC     = 60;
+        DOCX    = 61;
+        XLS     = 62;
+        XLSX    = 63;
+        ODT     = 64;
+        PPT     = 65;
+        TXT     = 66;
+        JSON    = 67;
+        XML     = 68;
+	HTML    = 69;
+	PDF     = 70;
+    }
+}

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Пользовательские справочники" type="Создание пользовательского справочника" alias="create_user_dict"  module="paragraf">
+
+	<group alias="version">
+		<!--Мажорная версия поднимается при потере обратной совместимости,
+			минорая - при любых изменениях-->
+		<spin_box name="Мажорная версия" alias="major" type="uint">1</spin_box>
+		<spin_box name="Минорная версия" alias="minor" type="uint">0</spin_box>
+	</group>
+
+	<repeater alias="user_tables" name="Справочники">
+		<text_field name="Название справочника" alias="user_table_name" required="true"></text_field>
+	
+		<repeater alias="table_values" name="Колонки:">		
+			<text_field name="Название колонки" alias="user_table_column" required="true"></text_field>
+			<combo_box name="Тип колонки" alias="user_table_type" required="true">
+				<item>уникальный идентификатор</item>
+				<item>текстовое значение</item>
+				<item>текстовая область</item>
+				<item>целочисленное значение</item>
+				<item>дробное значение</item>
+				<item>дата/время</item>
+				<item>дата</item>
+				<item>флаг</item>
+				<item>ссылка</item>
+				<item>фигура на карте</item>
+				<item>маркер на карте</item>
+				<item>файл</item>
+				<item>обратная ссылка</item>
+				<item>параметры ИСЗ (TLE)</item>
+				<item>json</item>
+				<item>внешняя ссылка</item>
+			</combo_box>
+			<check_box name="Обязательно к заполнению"  alias="check" required="true" ></check_box>
+			<!-- Данные необходимы только для колонок с типом ссылка. Для других - игнорируются -->
+			<group name="Данные для ссылки" alias="group_ref">
+				<!-- Допускается в качестве ссылки указывать текущую таблицу и любую колонку в ней -->
+				<text_field name="Название справочника для ссылки" alias="user_table_ref"></text_field>
+				<text_field name="Название колонки для ссылки" alias="user_table_column_ref"></text_field>
+				<check_box name="Каскадное удаление"  alias="check_cascade"></check_box>
+			</group>
+		</repeater>
+	</repeater>
+	
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<repeater alias="user_tables_complited" name="Добавленные справочники">	
+				<text_field name="Название справочника" alias="user_table_name" required="true"></text_field>
+			</repeater>
+			<repeater alias="user_tables_failed" name="Не добавленные справочники">
+				<text_field name="Название справочника" alias="user_table_name" required="true"></text_field>
+				<text_field name="Сообщение" alias="message" required="true"></text_field>
+			</repeater>
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>

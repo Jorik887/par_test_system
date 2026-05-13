@@ -1,0 +1,472 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paragraph Test System UI</title>
+    <link rel="stylesheet" href="./assets/app.css?v=20260426_5" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-top">PARAGRAPH</span>
+          <span class="brand-bottom">TEST MONITOR</span>
+        </div>
+        <nav class="menu">
+          <button class="menu-btn active" data-section="user-dicts-section">Справочники (ИШД)</button>
+          <button class="menu-btn" data-section="dicts-rest-section">Справочники (REST)</button>
+          <button class="menu-btn" data-section="paragraph-section">БД Параграфа</button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="topbar-title">
+            <h1>Система тестирования СПО Параграф</h1>
+            <p>Интерактивный интерфейс вместо ручного JSON в Swagger</p>
+          </div>
+          <div class="topbar-conn esb-conn-panel">
+            <div class="esb-col esb-conn-col">
+              <h3>Подключение</h3>
+              <label for="apiBase">Адрес системы тестирования (backend)</label>
+              <input id="apiBase" type="text" placeholder="http://127.0.0.1:8000" />
+              <label for="targetSelect">Профиль стенда</label>
+              <select id="targetSelect"></select>
+              <div class="esb-actions">
+                <button id="targetReloadBtn" class="btn btn-ghost">Профили</button>
+                <button id="targetAutoCurrentBtn" class="btn btn-ghost">Автонастроить стенд</button>
+                <button id="saveApiBase" class="btn btn-ghost">Сохранить</button>
+              </div>
+            </div>
+            <div class="esb-divider"></div>
+            <div class="esb-col esb-auth-col">
+              <h3>Авторизация</h3>
+              <label for="quickParagraphLogin">Логин</label>
+              <input id="quickParagraphLogin" type="text" placeholder="&#1083;&#1086;&#1075;&#1080;&#1085;" />
+              <label for="quickParagraphPassword">Пароль</label>
+              <input id="quickParagraphPassword" type="password" placeholder="&#1087;&#1072;&#1088;&#1086;&#1083;&#1100;" />
+              <div class="esb-actions">
+                <button id="pingApi" class="btn">Войти / Проверить</button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <section id="user-dicts-section" class="section active">
+          <article class="card">
+            <h2>Профили стендов (хост/VM/сборок)</h2>
+            <div class="hint">
+              Здесь хранится подключение к конкретному стенду: локальному хосту или виртуальной машине со сборкой. Обычно достаточно ввести только логин и пароль пользователя Параграф и нажать
+              <b>«Автонастроить стенд»</b>. Расширенные поля ниже нужны только для нестандартной сети, NAT или ручной диагностики.
+            </div>
+            <div class="table-wrap">
+              <table id="targetsTable"></table>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="targetEditId">ID (для редактирования)</label>
+                <input id="targetEditId" type="text" placeholder="пусто = создать новый" />
+              </div>
+              <div class="field">
+                <label for="targetName">Имя профиля</label>
+                <input id="targetName" type="text" placeholder="VM build 2026.03.23" />
+              </div>
+              <div class="field">
+                <label for="targetDescription">Описание</label>
+                <input id="targetDescription" type="text" placeholder="Кратко про сборку/стенд" />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="targetIshdHost">IP узла ИШД (обычно IP VM)</label>
+                <input id="targetIshdHost" type="text" placeholder="192.168.x.x" />
+              </div>
+              <div class="field">
+                <label for="targetIshdPort">Порт ИШД</label>
+                <input id="targetIshdPort" type="number" value="50200" />
+              </div>
+              <div class="field">
+                <label for="targetIshdHostId">Идентификатор отправителя ИШД (host_id)</label>
+                <input id="targetIshdHostId" type="text" placeholder="par_test_system" />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="targetIshdSoftwareName">Имя ПО в ИШД (software_name)</label>
+                <input id="targetIshdSoftwareName" type="text" value="Paragraph Test System" />
+              </div>
+              <div class="field">
+                <label for="targetIshdLogin">Логин пользователя Параграф</label>
+                <input id="targetIshdLogin" type="text" placeholder="admin" />
+              </div>
+              <div class="field">
+                <label for="targetIshdPassword">Пароль пользователя Параграф</label>
+                <input id="targetIshdPassword" type="password" placeholder="••••••" />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="targetHostIds">Получатели ИШД (target_host_ids, через запятую)</label>
+                <input id="targetHostIds" type="text" value="paragraf" />
+              </div>
+              <div class="field">
+                <label for="targetRestBase">REST API Параграфа (base_url)</label>
+                <input id="targetRestBase" type="text" value="http://127.0.0.1:5000" />
+              </div>
+              <div class="field">
+                <label for="targetParagraphDsn">Подключение к БД Параграфа (DSN, опционально)</label>
+                <input id="targetParagraphDsn" type="text" placeholder="postgresql+asyncpg://..." />
+              </div>
+            </div>
+            <div class="actions">
+              <button id="targetCreateBtn" class="btn">Создать профиль</button>
+              <button id="targetUpdateBtn" class="btn btn-ghost">Обновить профиль</button>
+              <button id="targetActivateBtn" class="btn btn-ghost">Сделать активным</button>
+              <button id="targetDeleteBtn" class="btn btn-danger">Удалить профиль</button>
+              <button id="targetClearFormBtn" class="btn btn-ghost">Очистить форму</button>
+            </div>
+            <div id="targetHint" class="hint"></div>
+          </article>
+
+          <article class="card">
+            <h2>Автотест справочников (одна кнопка)</h2>
+            <div class="field-row">
+              <div class="field">
+                <label for="autoSourceDict">Справочник из сборки (предустановленный или пользовательский)</label>
+                <select id="autoSourceDict"></select>
+              </div>
+              <div class="field">
+                <label>&nbsp;</label>
+                <div class="actions">
+                  <button id="autoReloadDictsBtn" class="btn btn-ghost">Обновить список</button>
+                  <button id="autoRunBtn" class="btn">Запустить автотест</button>
+                  <button id="autoCancelRunBtn" class="btn btn-danger">Остановить автотест</button>
+                </div>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field checkbox">
+                <label>
+                  <input id="autoIncludeCrud" type="checkbox" checked />
+                  Включать create/insert/search/update/remove на временном справочнике
+                </label>
+                <div class="hint option-help">Проверяет полный CRUD-цикл на временном тестовом справочнике, чтобы не портить предустановленные.</div>
+              </div>
+              <div class="field checkbox">
+                <label>
+                  <input id="autoIncludeAllTypes" type="checkbox" />
+                  Дополнительно: smoke create/delete по всем типам колонок
+                </label>
+                <div class="hint option-help">Быстрый смоук по типам колонок: создаёт и удаляет тестовые справочники для проверки совместимости.</div>
+              </div>
+              <div class="field checkbox">
+                <label>
+                  <input id="autoVerboseSteps" type="checkbox" />
+                  Подробные шаги (с request_xml)
+                </label>
+                <div class="hint option-help">Добавляет в отчёт технические XML-запросы и расширенные данные шагов для диагностики.</div>
+              </div>
+            </div>
+            <div id="autoRunStatus" class="hint auto-run-status" data-state="idle">Готово к запуску</div>
+            <div id="autoHumanSummary" class="hint auto-human-summary"></div>
+            <div class="actions">
+              <button id="autoRefreshReportsBtn" class="btn btn-ghost">Обновить историю прогонов</button>
+              <button id="autoDownloadReportBtn" class="btn btn-ghost">Скачать полный JSON</button>
+              <button id="autoDeleteReportBtn" class="btn btn-danger">Удалить прогон</button>
+            </div>
+            <div class="table-wrap">
+              <table id="autoRunsTable"></table>
+            </div>
+            <div class="table-wrap">
+              <table id="autoStepsTable"></table>
+            </div>
+            <h3 class="sub-title">Снимок справочника (как в СПО Параграф)</h3>
+            <div id="autoDictSnapshotMeta" class="hint auto-dict-snapshot-meta"></div>
+            <div class="table-wrap">
+              <table id="autoDictSnapshotTable"></table>
+            </div>
+            <h3 class="sub-title">JSON-отчет прогона</h3>
+            <pre id="autoReportJson" class="code"></pre>
+          </article>
+
+          <div class="grid two">
+            <article class="card">
+              <h2>Сессия справочника</h2>
+              <div class="field">
+                <label for="udDictName">Название справочника</label>
+                <input id="udDictName" type="text" placeholder="Тест_по_ТЗ_qa1" />
+              </div>
+              <div class="field">
+                <label for="udCreateMode">Режим создания</label>
+                <select id="udCreateMode">
+                  <option value="preset">По пресету</option>
+                  <option value="manual">Вручную (в стиле ESBMonitor)</option>
+                </select>
+              </div>
+              <div class="field" id="udPresetWrap">
+                <label for="udPreset">Шаблон структуры</label>
+                <select id="udPreset"></select>
+              </div>
+              <div id="udManualWrap" class="manual-create hidden">
+                <div class="actions">
+                  <button id="createAddColumnBtn" type="button" class="btn btn-ghost">+ Колонка</button>
+                  <button id="createSyncSeedBtn" type="button" class="btn btn-ghost">Синхронизировать стартовые строки</button>
+                </div>
+                <div id="createColumns" class="create-columns"></div>
+                <div class="hint">
+                  Поля `ref_dict` и `ref_column` нужны только для типа `link`.
+                </div>
+                <h3 class="sub-title">Стартовые строки (необязательно)</h3>
+                <div class="actions">
+                  <button id="createSeedAddRowBtn" type="button" class="btn btn-ghost">+ Строка</button>
+                </div>
+                <div class="table-wrap">
+                  <table id="createSeedGrid"></table>
+                </div>
+              </div>
+              <div class="actions">
+                <button id="udCreateBtn" class="btn">Создать</button>
+                <button id="udRemoveBtn" class="btn btn-danger">Удалить справочник</button>
+                <button id="udMetainfoBtn" class="btn btn-ghost">Метаинформация</button>
+                <button id="udQueryFrameBtn" class="btn btn-ghost">Структура</button>
+                <button id="udQueryBtn" class="btn btn-ghost">Query (полный)</button>
+              </div>
+              <div id="udSessionHint" class="hint"></div>
+            </article>
+
+            <article class="card">
+              <h2>Вставка строк</h2>
+              <div class="field">
+                <label for="insertColumns">Колонки (через запятую)</label>
+                <input id="insertColumns" type="text" value="name,description,is_active" />
+              </div>
+              <div class="actions">
+                <button id="insertBuildGridBtn" class="btn btn-ghost">Построить таблицу</button>
+                <button id="insertAddRowBtn" class="btn btn-ghost">Добавить строку</button>
+                <button id="insertSendBtn" class="btn">Отправить insert</button>
+              </div>
+              <div class="table-wrap">
+                <table id="insertGrid"></table>
+              </div>
+            </article>
+          </div>
+
+          <div class="grid two">
+            <article class="card">
+              <h2>Поиск / выбор строк</h2>
+              <div class="hint">
+                `Search` возвращает полные строки и `uuid` (нужно для `update/remove`). `Select Fields` нужен для выборки колонок/сортировки и может вернуть строки без `uuid`.
+              </div>
+              <div class="actions">
+                <button id="searchAddFilterBtn" class="btn btn-ghost">+ Фильтр</button>
+                <button id="searchBtn" class="btn">Search</button>
+                <button id="selectFieldsBtn" class="btn btn-ghost">Select Fields</button>
+              </div>
+              <div id="searchFilters" class="filters"></div>
+              <div class="table-wrap">
+                <table id="searchResults"></table>
+              </div>
+              <div id="searchSummary" class="hint"></div>
+            </article>
+
+            <article class="card">
+              <h2>Обновление выбранной строки</h2>
+              <div class="field">
+                <label for="updateRowId">row_id (uuid)</label>
+                <input id="updateRowId" type="text" placeholder="{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}" />
+              </div>
+              <div class="actions">
+                <button id="updateAddFieldBtn" class="btn btn-ghost">+ Поле</button>
+                <button id="updateSendBtn" class="btn">Обновить</button>
+              </div>
+              <div id="updateFields" class="kv-list"></div>
+            </article>
+          </div>
+
+          <div class="grid two">
+            <article class="card">
+              <h2>Файлы в справочнике</h2>
+              <div class="field">
+                <label for="fileRowId">row_id (uuid)</label>
+                <input id="fileRowId" type="text" placeholder="{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}" />
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="fileColumn">Колонка с файлом</label>
+                  <input id="fileColumn" type="text" placeholder="file_column" />
+                </div>
+                <div class="field">
+                  <label for="fileIndex">Индекс файла (для input_file)</label>
+                  <input id="fileIndex" type="number" min="0" value="0" />
+                </div>
+              </div>
+              <div class="field">
+                <label for="fileUploadInput">Файл для загрузки</label>
+                <div class="file-input-row">
+                  <input id="fileUploadInput" type="file" />
+                  <button id="fileUploadResetBtn" type="button" class="btn btn-ghost btn-small">Сбросить</button>
+                </div>
+              </div>
+              <div class="actions">
+                <button id="fileUploadBtn" class="btn">Загрузить файл</button>
+                <button id="fileDownloadBtn" class="btn btn-ghost">Скачать файл</button>
+                <button id="fileClearBtn" class="btn btn-ghost">Очистить файл</button>
+              </div>
+              <div id="fileHint" class="hint">
+                Выберите строку в таблице Search/Select Fields, укажите колонку и запустите загрузку/скачивание.
+              </div>
+            </article>
+          </div>
+
+          <div class="grid two">
+            <article class="card">
+              <h2>Удаление строк</h2>
+              <div class="field-row">
+                <div class="field">
+                  <label for="deleteMode">Режим удаления</label>
+                  <select id="deleteMode">
+                    <option value="selected">По выбранной строке</option>
+                    <option value="filters">По фильтрам</option>
+                  </select>
+                </div>
+                <div class="field checkbox">
+                  <label>
+                    <input id="deleteAllowMany" type="checkbox" />
+                    allow_many (для bulk delete)
+                  </label>
+                </div>
+              </div>
+              <div class="field">
+                <label for="deleteRowId">`row_id` вручную (если строка не выбрана в таблице)</label>
+                <input id="deleteRowId" type="text" placeholder="{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}" />
+              </div>
+              <div class="actions">
+                <button id="deleteAddFilterBtn" class="btn btn-ghost">+ Фильтр</button>
+                <button id="deleteSendBtn" class="btn btn-danger">Удалить строки</button>
+              </div>
+              <div id="deleteFilters" class="filters"></div>
+              <div id="deleteHint" class="hint"></div>
+            </article>
+
+            <article class="card">
+              <h2>Ответ последней операции</h2>
+              <div class="actions">
+                <button id="udLastResponseDownloadBtn" class="btn btn-ghost btn-small">Скачать JSON ответа</button>
+              </div>
+              <pre id="udLastResponse" class="code"></pre>
+            </article>
+          </div>
+        </section>
+
+        <section id="dicts-rest-section" class="section">
+          <div class="grid two">
+            <article class="card">
+              <h2>Справочники через REST</h2>
+              <div class="field">
+                <label for="restDictName">Новый справочник</label>
+                <input id="restDictName" type="text" placeholder="Тест_rest_01" />
+              </div>
+              <div class="actions">
+                <button id="restListBtn" class="btn btn-ghost">List</button>
+                <button id="restCreateBtn" class="btn">Create</button>
+              </div>
+              <div class="field">
+                <label for="restTableUid">table_uid</label>
+                <input id="restTableUid" type="text" placeholder="UID справочника" />
+              </div>
+              <div class="actions">
+                <button id="restMetaBtn" class="btn btn-ghost">Meta</button>
+                <button id="restRowsBtn" class="btn btn-ghost">Rows</button>
+                <button id="restDeleteBtn" class="btn btn-danger">Delete dict</button>
+              </div>
+              <div id="restHint" class="hint"></div>
+            </article>
+
+            <article class="card">
+              <h2>Строки (REST)</h2>
+              <div class="actions">
+                <button id="restInsertAddFieldBtn" class="btn btn-ghost">+ Поле для insert</button>
+                <button id="restInsertBtn" class="btn">Insert row</button>
+              </div>
+              <div id="restInsertFields" class="kv-list"></div>
+              <hr />
+              <div class="field">
+                <label for="restUpdateRowId">row_id для update</label>
+                <input id="restUpdateRowId" type="text" />
+              </div>
+              <div class="actions">
+                <button id="restUpdateAddFieldBtn" class="btn btn-ghost">+ Поле для update</button>
+                <button id="restUpdateBtn" class="btn">Update row</button>
+              </div>
+              <div id="restUpdateFields" class="kv-list"></div>
+            </article>
+          </div>
+
+          <article class="card">
+            <h2>Ответ REST-операции</h2>
+            <pre id="restResponse" class="code"></pre>
+          </article>
+        </section>
+
+        <section id="paragraph-section" class="section">
+          <div class="grid two">
+            <article class="card">
+              <h2>Результатные документы (БД Параграфа)</h2>
+              <div class="field-row">
+                <div class="field">
+                  <label for="pgLimit">limit</label>
+                  <input id="pgLimit" type="number" value="50" min="1" max="500" />
+                </div>
+                <div class="field">
+                  <label for="pgOffset">offset</label>
+                  <input id="pgOffset" type="number" value="0" min="0" />
+                </div>
+                <div class="field">
+                  <label for="pgSearch">search</label>
+                  <input id="pgSearch" type="text" placeholder="по имени документа" />
+                </div>
+                <div class="field">
+                  <label for="pgFilesFilter">files_filter</label>
+                  <select id="pgFilesFilter">
+                    <option value="">(без фильтра)</option>
+                    <option value="all_ok">all_ok</option>
+                    <option value="all_broken">all_broken</option>
+                  </select>
+                </div>
+              </div>
+              <div class="actions">
+                <button id="pgListBtn" class="btn">Обновить список</button>
+              </div>
+              <div class="table-wrap">
+                <table id="pgResultsTable"></table>
+              </div>
+            </article>
+
+            <article class="card">
+              <h2>Детали документа</h2>
+              <div class="field">
+                <label for="pgSelectedId">result_id</label>
+                <input id="pgSelectedId" type="text" />
+              </div>
+              <div class="actions">
+                <button id="pgLoadDetailBtn" class="btn btn-ghost">Загрузить detail</button>
+                <button id="pgLoadContentBtn" class="btn btn-ghost">Загрузить content</button>
+                <button id="pgExportJsonBtn" class="btn btn-ghost">Export JSON</button>
+                <button id="pgExportCsvBtn" class="btn btn-ghost">Export CSV</button>
+                <button id="pgExportXlsxBtn" class="btn btn-ghost">Export Excel</button>
+                <button id="pgExportZipBtn" class="btn btn-ghost">Export ZIP</button>
+              </div>
+              <pre id="pgResponse" class="code"></pre>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast"></div>
+    <script src="./assets/app.js?v=20260426_5" defer></script>
+  </body>
+</html>
+
+

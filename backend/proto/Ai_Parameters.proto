@@ -1,0 +1,288 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Common.proto";
+import "BinaryDataParam.proto";
+
+// Параметр "Флажок"
+message CheckBoxParameter {
+	required bool   checked = 1;
+	optional string text = 2;
+}
+
+// Параметр "Текстовое окно редактирования"
+message TextFieldParameter {
+	enum UiType {
+		SINGLELINE = 1;
+		MULTILINE  = 2;
+	}
+	required UiType ui_type  	=  1;
+	optional string text  		=  6;
+	optional uint32 max_symbols =  7; // Максимальное количество символов ввода
+}
+
+message LabelParameter {
+    optional string text  		=  1;
+}
+
+// Параметр "Значение из интервала"
+message ValueFromIntervalParameter {
+	enum UiType {
+		SLIDER   = 1;
+        SPIN_BOX = 2;
+	}
+	enum Type {
+		UINT     = 1; // целое беззнаковое число
+		INT      = 2; // целое знаковое
+		DOUBLE   = 3; // дробные числа
+	}
+
+	// Представление числа
+	message ParameterNumber {
+		optional int32 int_value     = 1;
+		optional uint32 uint_value   = 2;
+		optional double double_value = 3;
+	}
+
+	required Type   type       =  1;  // тип спинбокса
+	required UiType ui_type    =  2;  // тип спинбокса
+
+	required ParameterNumber  min_value  =  7;          // Минимально возможное значение
+	required ParameterNumber  max_value  =  8;          // Максимально возможное значение
+	required ParameterNumber  step       =  9;          // Шаг изменения значения
+	required ParameterNumber  value      =  10;         // Текущее значение
+    optional uint32   precision = 11 [default = 3];     // Точность после запятой, для дробных
+}
+
+// Параметр "Выбор значения из списка"
+message ComboBoxParameter {
+	enum UiType {
+		STANDARD     = 1; // Стандартный комбобокс
+		MULTIPLE     = 2; // Позволяет выбрать несколько значений вместо одного
+		RADIOBUTTON  = 3; // Единовременно может быть выбран только один элемент
+	}
+	required UiType ui_type       =  1; // Тип комбобокса
+	repeated string values        =  2; // Список значений для выбора
+	repeated int32 current_index  =  3; // Индекс текущего выбранного элемента (от 0 до values_size()-1). Если (current_index < 0 || current_index >= values_size()), текущий элемент пуст (не выбран)
+}
+
+// Расширенный параметр комбобокса
+message ObjectComboBoxParameter {
+	enum ValueType {
+		STRING = 1;
+		INT    = 2;
+		UINT   = 3;
+		DOUBLE = 4;
+	}
+	message ValueItem {
+		required UUID      id        = 1; // Уникальный идентификатор элемента
+		required string display_name = 2; // То, как параметр отображается на GUI
+
+		// данные. Заполнено одно из значений в соответствии с type
+		optional string string_value = 10;
+		optional int64  int_value    = 11;
+		optional uint64 uint_value   = 12;
+		optional double double_value = 13;
+	}
+	required ComboBoxParameter.UiType ui_type = 1; // Тип комбобокса
+	required ValueType value_type =  2; // Тип хранимых данных
+	repeated ValueItem values     =  3; // Список значений для выбора
+	repeated UUID      selected   =  4; // Показывает выбранные элементы
+}
+
+// Параметр "Выбор даты и времени"
+message DateTimeParameter {
+	enum Type {
+		DATE = 1;
+		TIME = 2;
+		DATETIME = 3;
+	}
+	required Type       type  = 1; // тип задания времени
+	required SystemTime time  = 2; // время. В зависимости от выбранного типа заполняются только значимые части
+	optional string     mask  = 3; // Маска вводимого времени (dd.MM HH:mm)
+	optional bool       range = 4; // Показывает, что вводимое значение показывает интервал времени
+}
+
+// Поле ввода координат. Данные указываются в формате WGS84
+message CoordinatesParameter {
+	// Разделение координат на разные части используется в таблице
+	enum Type {
+		LAT       = 1;  // Ввод только широты
+		LON       = 2;  // Ввод только долготы
+		ALT       = 3;  // Ввод только высоты
+		LATLON    = 4;  // Ввод обеих координат
+		LATLONALT = 5;  // Ввод координат и высоты
+		POI       = 6;  // Добавление точки интереса
+	}
+	required Type   type      = 1;
+	optional double latitude  = 2;
+	optional double longitude = 3;
+	optional double altitude  = 4;
+	optional POI    point     = 5;
+}
+
+// deprecated
+// Поле ввода частоты
+message FrequencyParameter {
+	// Фиксированный формат частоты
+	enum ViewType {
+		Hz  = 1;
+		kHz = 2;
+		MHz = 3;
+		GHz = 4;
+	}
+	required uint64   frequency = 1;  // Частота в Гц
+	optional ViewType type      = 2;  // Тип отображения. Если не задан, выбирается на GUI
+	optional uint32   precision = 3;  // Точность после запятой. Для type=Hz не используется
+    optional uint64   min_value = 4;  // минимальная частота
+    optional uint64   max_value = 5;  // максимальная частота
+}
+
+// Поле ввода частоты с плавающей запятой
+message FloatFrequencyParameter {
+	// Фиксированный формат частоты
+	enum ViewType {
+		Hz  = 1;
+		kHz = 2;
+		MHz = 3;
+		GHz = 4;
+	}
+	required double   frequency = 1;  // Частота
+	required ViewType type      = 2;  // Порядок частоты
+	optional uint32   precision = 3;  // Точность после запятой
+    optional uint64   min_value = 4;  // минимальная частота
+    optional uint64   max_value = 5;  // максимальная частота
+}
+
+message LinkParameter {
+    required string link    = 1; // текст гиперссылки
+    optional string title   = 2; // текст заменяющий текст гиперссылки (синоним)
+}
+
+message InputFile {
+    repeated FileInfo file_info = 1;      // информация файла
+    repeated string name_filters = 2; // фильтр при выборе имени файла
+    optional bool multiple  = 3 [ default = false ];    // добавить несколько файлов
+
+}
+
+message OneOfParameters {
+	enum Type {
+		CHECK_BOX    = 1; // Параметр "Флажок"
+		TEXT_FIELD   = 2; // Параметр "Однострочное окно редактирования"
+		COMBO_BOX    = 3; // Параметр "Выбор из списка"
+		INTERVAL     = 4; // Параметр "Значение из интервала"
+		DATE_TIME    = 5; // Параметр "Выбор даты и времени"
+		COORDINATES  = 6; // Параметр "Выбор координаты"
+		TABLE        = 7; // Таблица
+		GROUP        = 8; // Группа параметров
+		REPEATER     = 9; // Повтор параметров
+		FREQUENCY    = 10; // Параметр "Выбор частоты" deprecated
+        LABEL        = 11; // Параметр "Надпись"
+		FLOAT_FREQUENCY = 12; // Параметр "Выбор частоты" (дробное значение частоты)
+        LINK         = 13; // Параметр "Ссылка"
+        INPUT_FILE   = 14; // Параметр "прикрепить файл"
+		OBJECT_COMBO_BOX = 15; // Расширенный комбобокс с пользовательскими данными
+		DOCUMENT_PARAM = 16; // Параметр с документом
+		ACTION_PARAM   = 17; // Параметр с действием
+        BINARY_DATA_PARAM   = 18; // Параметр с бинарными данными
+        SIGN         = 19; // Цифровая подпись
+	}
+	required Type type = 1;
+
+	optional CheckBoxParameter          check_box   = 10; // Параметр "Флажок"
+	optional TextFieldParameter         text_field  = 11; // Параметр "Однострочное окно редактирования"
+	optional ComboBoxParameter          combo_box   = 12; // Параметр "Выбор из списка"
+	optional ValueFromIntervalParameter interval    = 13; // Параметр "Значение из интервала"
+	optional DateTimeParameter          date_time   = 14; // Параметр "Выбор даты и времени"
+	optional CoordinatesParameter       coordinates = 15; // Параметр "Выбор координаты"
+	optional Table                      table       = 16; // Таблица
+	optional GroupParameter             group       = 17; // Группа параметров
+	optional Repeater                   repeater    = 18; // Повтор параметров
+	optional FrequencyParameter         frequency   = 19; // Параметр "Выбор частоты" !!! deprecated
+	optional LabelParameter             label       = 20; // Параметр "Надпись"
+	optional FloatFrequencyParameter    float_frequency = 21; // Параметр "Выбор частоты" (дробное значение частоты)
+	optional LinkParameter              link        = 22; // Параметр "Ссылка"
+	optional InputFile                  files       = 23;   // файл
+	optional ObjectComboBoxParameter    object_combo_box = 24; // Расширенный параметр "Выбор из списка"
+	optional DocumentParameter          document_param = 25;
+	optional ActionParameter            action_param = 26;
+    optional BinaryDataParameter        binary_param = 27;
+    optional SignParameter              sign        = 28;
+}
+
+// Таблица
+message Table {
+	message Title {
+		required string name = 1; // название колонки
+		required OneOfParameters parameter = 2;
+		optional string alias = 3; // псевдоним колонки для автоматического разбора
+	}
+	message Row {
+		repeated OneOfParameters elements = 1;  // тип отображения данных
+	}
+    repeated Title title        = 1; //заголовок таблицы
+    repeated Row rows           = 2; //список строк в таблице
+    optional uint32 max_count   = 3; //максимальное число строк в таблице
+}
+
+// Группа параметров
+message GroupParameter {
+	repeated Parameter parameters = 1; // Список параметров
+}
+
+// Пополняемый список сгрупированных параметров
+message Repeater {
+    message RepeaterItem {
+		repeated Parameter view = 1; // Список параметров для отобржения
+        optional string name    = 2;  // Название группы
+	}
+	repeated RepeaterItem data  = 2;  // Список повторяющихся параметров
+	repeated Parameter template = 3;  // Описание формы репитера. При добавлении нового элемента в data параметры будут копироваться отсюда
+    optional uint32 max_count    = 4; //максимальное число групп
+}
+
+// Передача документа в параметре
+message DocumentParameter {
+	required bytes document = 1; // Сериализованное сообщение документа
+}
+
+// Передача действия в параметре
+message ActionParameter {
+	required UUID  documentId = 1; // Идентификатор документа, к которому привязано действие
+	required bytes action     = 2; // Сериализованное сообщение действия
+}
+
+// Цифровая подпись
+message SignParameter {
+	// Подпись считается валидной, если заданы поля data и author
+	optional bytes data         = 1; // Подпись
+	optional UUID author        = 2; // Автор подписи - id пользователя
+	optional string name        = 3; // Имя автора подписи
+	optional SystemTime time    = 4; // Время подписи
+	optional string description = 5; // Дополнительное описание
+}
+
+// тип поля для параметра
+message FormatParamField {
+    enum TypeField{
+        SimpleField = 1;    // default
+        RequiredField = 2;  // обязателен к заполнению
+        OptionalField = 3;  // можно ли значение проигнорировать
+    }
+    required TypeField type = 1 [ default = SimpleField ];
+    optional bool empty =2; // for OptionalField
+}
+
+// Параметр документа
+message Parameter {
+	required uint32 id             = 2; // Идентификатор параметра (должен быть уникальным пределах документа)
+	optional string name           = 3; // Имя параметра для отображения на UI. Если не задано - без имени
+	optional string description    = 4; // Описание параметра для отображения на UI. Используется в качестве всплывающей подсказки
+	optional bool   enabled        = 5 [ default = true ]; // Доступен ли параметр для редактирования на UI
+	required OneOfParameters element = 6;
+	optional string alias          = 7; // Псевдоним параметра, используется для автоматического разбора документа
+    optional bool   required_param = 8 [ default = false ]; // deprecated -- показывает, что параметр обязателен к заполнению
+	optional bool   hidden         = 9; // Показывает, что параметр не должен отображаться на GUI
+    optional FormatParamField type_field = 10; // выбор типа поля: обязательное, опциональное
+}

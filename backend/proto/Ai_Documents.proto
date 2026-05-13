@@ -1,0 +1,272 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Common.proto";
+import "Ai_Report.proto";
+import "Ai_Parameters.proto";
+
+// Действие над документом
+message Action {
+    repeated Parameter items    = 3; // Необходимые параметры для выполнения действия
+    repeated FileInfo files     = 4; // Приложенные файлы
+    repeated POI mapItems       = 14; // Точки интереса
+    optional string description = 7; // краткое описание действия
+    optional string button      = 8; // текст кнопки для GUI
+    required string state       = 9; // id состояния, в которое переводит текущее действие
+    optional SystemTime time    = 13; // время выполнения действия
+
+    // Следующие поля не используются в текущей реализации ИШД:
+    optional bool mayBeChange   = 5 [default = true]; //возможно ли изменение действия (на время)
+    optional bool mayBeAttach   = 6 [default = false]; //возможно ли прикреплять файлы
+    repeated string roles       = 10; // роли участников документооборота, кто может инициировать дейсвтие
+    repeated string import      = 11; // роли участников документооборота, кто также переводится в следующее состояние
+    repeated string receivers   = 12; // роли участников документооборота, кому будет отправлено действие
+}
+
+//Состояние документа у участника
+message State {
+    enum Type {
+        START	= 1; // Начальное состояние документа
+        FINAL 	= 2; // Конечное состояние документа
+        DEFAULT = 3; // Промежуточное состояние
+    }
+    optional Type type      = 1 [default = DEFAULT]; // тип состояния (если состояние отлично от промежуточного)
+    required string id      = 2; // уникальный id состояния
+    optional string name    = 3; // название состояния. Нужно лишь для отображения на GUI
+    repeated Action actions = 4; // список действий доступных в текущем состоянии
+}
+
+// Условия выполнения документа
+message Condition {
+    optional SystemTime startTime = 1;  // время начала выполнения
+    optional SystemTime stopTime  = 2;  // время окончания выполнения
+    optional string description   = 3;  // текстовое описание условия
+    optional POI position         = 4;  // место выполнения документа
+}
+
+// Описание участника документооборота
+message Client {
+    optional string role = 1 [default = "executer"]; // роль участника документоборота
+    required UserId id   = 2; // id участника документооборота
+}
+
+// Описание документа
+message Document {
+    enum Mode {
+        ORDINARY   = 1;
+        INDICATION = 2;
+    }
+
+    // категории документов
+    enum Category {
+        DIAGNOSTIC      = 1; // диагностический документ
+        POST_EVENT      = 2; // событие поста
+        EDM             = 3; // электронный документооборот
+        TRAFFIC_SESSION = 4; // сеанс связи
+        RADIO_SOURCE    = 5; // информация об ИРИ
+        TEXT            = 6; // текстовое сообщение
+        IMAGE           = 7; // картинка
+    }
+
+    required UUID       id                = 1;   // идентификатор документа
+    required string     type              = 2;   // тип документа
+    required SystemTime time              = 4;   // время создания документа
+    optional string     group             = 7;   // группа, к которой принадлежит документ
+    repeated FileInfo   files             = 8;   // приложенные файлы
+    repeated POI        mapItems          = 16;  // точки интереса
+    optional bool       mayBeAttach       = 9;   // возможно ли прикреплять файлы
+    optional string     alias             = 11;  // псевдоним документа, используется для автоматической обработки документа
+    repeated Client     clients           = 12;  // список участников документооборота
+    optional bool       host_only         = 13;  // показывает, что документ не отображается в GUI
+    optional Mode       mode              = 14;  // тип документа
+    optional UUID       parentId          = 15;  // родительский документ
+    optional string     taskId            = 17;  // идентификатор задачи
+    optional bool       training          = 18;  // показывает, что документ создан в режиме "Тренаж"
+    optional bool       internal_doc      = 19;  // показывает, что документ не является частью журналируемого ЭДО (документ не будет перенаправляться в Параграф)
+    optional Category   category          = 25;  // категория, к которой относится документ
+    optional bool       wait_for_receiver = 26;  // документ будет отложен в базу данных ИШД до тех пор, пока получатель не появится в сети (только для пользователей)
+
+    repeated Parameter items         = 20;  // список полей документа
+    repeated State states            = 23;  // список состояний документа
+    repeated Action global_actions   = 24;  // список действий доступных из любого состояния
+}
+
+
+// Отправка документа. Начальное сообщение по документу
+// В ответ должен приходить DocumentResponse
+message SendDocumentRequest {
+    required Document document     = 1;  // описание документа
+
+    // Поле conditions не используется в текущей реализации ИШД
+    repeated Condition conditions  = 2;  // условия выполнения документа
+}
+
+// Выполение действия с документом
+// В ответ должен приходить DocumentResponse
+message SendActionRequest {
+    required UUID        id     = 1; // идентификатор документа
+    required Action      action = 2; // действие над документом
+}
+
+
+// Ответ на сообщения по работе с документом
+message DocumentResponse {
+    required UUID         id      = 1; // идентификатор документа
+    required proto.Report report  = 2; // отчет о выполнении
+    optional bool system_response = 3; // показывает, что данное сообщение прислала ИШД (результат приёма документа в систему)
+}
+
+// Запрос файла от приложения к ИШД
+message QueryFile
+{
+    optional UUID   doc_id                 = 3; // идентификатор документа
+    required string file_id                = 1; // идентификаторы файлов, которые должна скачать ИШД
+    optional uint32 progress_update_period = 2; // период нотификации от Интегратора о статусе передачи файла.
+                                                // default = 1. Задаётся в секундах
+	optional string directory				= 4; // путь куда будет скопирован файл
+}
+
+// Ответ на запрос
+message QueryFileResponse
+{
+    optional UUID         doc_id    = 3;    // идентификатор документа
+    required string       file_id   = 1;    // Идентификатор файла
+    required proto.Report report    = 2;    // Код завершения
+    optional bool system_response   = 4;    // показывает, что данное сообщение прислал А-Интегратор
+    optional string       message_id   = 5; // Идентификатор сессии передачи файла в нодусе (заполняется ИШД)
+}
+
+// Остановить передачу файла
+message FileTransmitCancel
+{
+    optional UUID           doc_id = 2;     // идентификатор документа
+    required string         file_id = 1;
+    optional string         message_id = 3; // заполняется УШД
+}
+
+// Остановить/Приостоновить/возобновить передачу файла
+// Для остановки скачивания можно использовать вместо FileTransmitCancel
+message FileTransmitControl
+{
+    // Управление скачиванием
+    enum FileControlAction {
+        CANCEL            = 1; // Остановить передачу файла
+        PAUSE             = 2; // Приостановить передачу файла
+        RESUME            = 3; // Возобновить передачу файла
+    }
+    required string            file_id = 1; // Идентификатор файла
+    required FileControlAction  action = 2; // Управление скачиванием файла
+    optional UUID               doc_id = 3; // Идентификатор документа
+    optional string         message_id = 4; // Заполняется УШД
+}
+
+// Ответ на остановку передачи файла
+message FileTransmitResponse
+{
+    optional proto.Report report    = 1; // Код завершения
+    optional bool system_response   = 2; // показывает, что данное сообщение прислала УШД
+}
+
+// Оповещение о
+message FileProgressUpdate
+{
+    optional UUID         doc_id    = 5; // идентификатор документа
+    required string       file_id   = 1; // Идентификатор сессии передачи файла
+    required float        percent   = 2; // Байт получено
+    optional proto.Report report    = 3; // Код завершения
+    optional string       file_path = 4; // Если передача успешно завершена, то будет передан полный путь до файла
+    optional bool            paused = 6; // Если скачивание файла приостоновленно
+}
+
+// базовое сообщение документооборота
+message EdmMessage {
+    enum MsgType {
+        SEND_DOCUMENT_REQUEST       = 1;
+        SEND_ACTION_REQUEST         = 2;
+        DOCUMENT_RESPONSE           = 3;
+        QUERY_FILE                  = 8;
+        QUERY_FILE_RESPONSE         = 9;
+        PROGRESS_UPDATE             = 10;
+        FILE_TRANSMIT_CANCEL        = 11;
+        FILE_TRANSMIT_RESPONSE      = 12;
+        FILE_REGISTRATION           = 20;
+        FILE_REGISTRATION_RESPONSE  = 21;
+        FILE_TRANSMIT_CONTROL       = 22;
+        FILE_DOWNLOAD_INDICATION    = 23;
+
+        // deprecated
+        DOCUMENT_LIST_REQUEST       = 4;
+        DOCUMENT_LIST_RESPONSE      = 5;
+        SET_DOCUMENT_REQUEST        = 6;
+        SET_DOCUMENT_RESPONSE       = 7;
+    }
+    required MsgType                  msg_type                    = 1;
+    optional SendDocumentRequest      send_document_request       = 2;
+    optional SendActionRequest        send_action_request         = 3;
+    optional DocumentResponse         document_response           = 4;
+    optional QueryFile                query_file                  = 9;
+    optional QueryFileResponse        query_file_response         = 10;
+    optional FileProgressUpdate       file_progress_update        = 11;
+    optional FileTransmitCancel       file_transmit_cancel        = 12;
+    optional FileTransmitResponse     file_transmit_response      = 13;
+    optional FileRegistration         file_registration           = 20;
+    optional FileRegistrationResponse file_registration_response  = 21;
+    optional FileTransmitControl      file_transmit_control       = 22;
+    optional FileDownloadIndication   file_download_indication    = 23;
+
+    // deprecated
+    optional DocumentListRequest      doc_list_request            = 5;
+    optional DocumentListResponse     doc_list_response           = 6;
+    optional SetDocumentRequest       set_doc_request             = 7;
+    optional SetDocumentResponse      set_doc_response            = 8;
+}
+
+// Запрос списка документов
+message DocumentListRequest {
+    optional UUID  id = 1; // При указании идентификатора документа в ответ вернется только выбранный документ
+}
+
+// Получение списка документов от удаленного узла
+message DocumentListResponse {
+    repeated Document     list = 1;
+    required proto.Report report = 2;
+}
+
+// Установка списка документов у удаленного узла
+message SetDocumentRequest {
+    enum CopyType {
+        WIPE_DATA = 1; // все имеющиеся документы будут удалены
+        REPLACE   = 2; // происходит замена документов, если идентификаторы совпадают
+        ADD_ONLY  = 3; // замена не происходит, будут добавлены только новые документы
+    }
+    repeated Document list = 1; // список документов для замены
+    required CopyType type = 2; // Тип копирования документов
+}
+
+// Ответ на команду изменения списка документов
+message SetDocumentResponse {
+    required Report report = 1;
+}
+
+// Регистрация принятого файла на узле (клиент гарантирует хранение указанного файла)
+message FileRegistration {
+    required string file_id   = 1;  // Идентификатор файла
+    required bool register    = 2;  // Показывает устанавливаем регистрацию или снимаем
+    optional string file_path = 3;  // Расположение файла, указывается для register = true
+}
+
+// Ответ от ИШД на регистрацию файла
+message FileRegistrationResponse {
+    required string file_id      = 1;  // Идентификатор файла
+    required proto.Report report = 2;  // Результат выполнения команды. Возможные результаты:
+                                       //     DONE - файл успешно добавлен/снят с учёта
+                                       //     ERR_FILE_NOT_FOUND - файл не найден на диске
+                                       //     ERR_NOT_ENOUGH_DATA - некорректно указан id файла
+}
+
+// Сообщение от ИШД о том, что получатель скачал файл
+message FileDownloadIndication {
+    required string file_id    = 1;  // идентификатор скачанного файла
+    required UUID   machine_id = 2;  // идентификатор узла, на котором был скачан файл
+    required string host_id    = 3;  // идентификатор подключаемого ПО(модуля)
+}

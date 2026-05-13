@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="Набор объектов из kml" group="Служебные" alias="kml_placemarks_repeater">
+	<text_field  name="Наименование файла" alias="filename"/>
+	 <repeater name="Объекты" alias="objects">
+        <text_field  name="Наименование" alias="name"/>
+		<text_field  name="Описание" alias="description"/>
+		<coordinates name="Объект" alias="object" type="poi"/>
+    </repeater>
+</document>

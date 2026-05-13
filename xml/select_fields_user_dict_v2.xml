@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Пользовательские справочники" type="Запрос полей из пользовательского справочника" alias="select_fields_user_dict"  module="paragraf">
+
+	<group alias="version" name="Версия">
+		<!--Мажорная версия поднимается при потере обратной совместимости,
+			минорая - при любых изменениях-->
+		<spin_box name="Мажорная версия" alias="major" type="uint">1</spin_box>
+		<spin_box name="Минорная версия" alias="minor" type="uint">0</spin_box>
+	</group>
+
+	<check_box name="Разворачивать поля типа 'Ссылка'" alias="user_table_links_is_expand" />
+
+	<text_field name="Название справочника" alias="user_table_name" required="true"></text_field>
+	
+	<repeater alias="table_filters" name="Фильтрация по полям">
+		<text_field name="Поле" alias="column"></text_field>
+		<combo_box name="Условие" alias="condition">
+			<item>Равно</item>
+			<item>Не равно</item>
+			<item>Больше</item>
+			<item>Не больше</item>
+			<item>Меньше</item>
+			<item>Не меньше</item>
+			<item>Содержит</item>
+		</combo_box>
+		<text_field name="Значение" alias="column_value"></text_field>
+	</repeater>
+	
+	<repeater alias="table_order_by_conditions" name="Порядок значений">
+		<text_field name="Поле" alias="order_column"></text_field>
+		<combo_box name="Сортировать по" alias="order_condition">
+			<item>Возрастанию</item>
+			<item>Убыванию</item>
+		</combo_box>
+	</repeater>
+
+	<spin_box alias="table_limit" max="100000" min="1" name="Максимальное количество значений" type="uint" uitype="spinbox"/>
+    <spin_box alias="table_offset" max="2147483647" min="0" name="Количество пропускаемых записей" type="uint" uitype="spinbox"/>
+
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<!-- При успешном выборе в ответ приходят все строки из справочника. -->
+			<repeater alias="table_rows" name="Строки">
+			    <repeater alias="table_columns" name="Колонки">
+					<text_field alias="column_name" name="Наименование колонки" />
+					<combo_box alias="column_type" name="Тип колонки">
+						<item>уникальный идентификатор</item>
+						<item>текстовое значение</item>
+						<item>текстовая область</item>
+						<item>целочисленное значение</item>
+						<item>дробное значение</item>
+						<item>дата/время</item>
+						<item>дата</item>
+						<item>флаг</item>
+						<item>ссылка</item>
+						<item>фигура на карте</item>
+						<item>маркер на карте</item>
+						<item>файл</item>
+						<item>обратная ссылка</item>
+						<item>параметры ИСЗ (TLE)</item>
+						<item>json</item>
+						<item>внешняя ссылка</item>
+					</combo_box>
+
+					<text_field alias="value" name="Значение" />
+					<spin_box alias="value" name="Значение" type="int" min="0" max="100" />
+					<spin_box alias="value" name="Значение" type="double" min="0" max="100" step="0.1" />
+					<date alias="value" name="Значение" type="time" />
+					<date alias="value" name="Значение" type="datetime" />
+					<check_box alias="value" name="Значение" />
+					<coordinates alias="value" type="poi" name="Значение" />
+					<binary_param alias="value" name="Значение" />
+					<input_file alias="value" name="Значение" />
+					
+					<group alias="group_link" name="Ссылка">
+						<text_field alias="table_name" name="Название справочника" />
+						<text_field alias="row_id" name="Идентификатор строки" />
+						<repeater alias="table_columns" name="Колонки">
+							<text_field alias="column_name" name="Наименование колонки" />
+							<combo_box alias="column_type" name="Тип колонки">
+								<item>уникальный идентификатор</item>
+								<item>текстовое значение</item>
+								<item>текстовая область</item>
+								<item>целочисленное значение</item>
+								<item>дробное значение</item>
+								<item>дата/время</item>
+								<item>дата</item>
+								<item>флаг</item>
+								<item>ссылка</item>
+								<item>фигура на карте</item>
+								<item>маркер на карте</item>
+								<item>файл</item>
+								<item>обратная ссылка</item>
+								<item>параметры ИСЗ (TLE)</item>
+								<item>json</item>
+								<item>внешняя ссылка</item>
+							</combo_box>
+
+							<text_field alias="value" name="Значение" />
+							<spin_box alias="value" name="Значение" type="int" min="0" max="100" />
+							<spin_box alias="value" name="Значение" type="double" min="0" max="100" step="0.1" />
+							<date alias="value" name="Значение" type="time" />
+							<date alias="value" name="Значение" type="datetime" />
+							<check_box alias="value" name="Значение" />
+							<coordinates alias="value" type="poi" name="Значение" />
+							<binary_param alias="value" name="Значение" />
+							<input_file alias="value" name="Значение" />
+						</repeater>
+					</group> 
+				</repeater>
+			</repeater>
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>
+

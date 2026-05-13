@@ -1,0 +1,79 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Report.proto";
+
+// Команда запуска стороннего модуля
+message ModuleLaunchRequest {
+	required string moduleName = 1; // Название модуля
+	optional string group      = 2; // Группа, к которой принадлежит узел сети
+	optional string launchMode = 3; // Режим работы модуля
+	optional bool   training   = 4; // Запуск в режиме тренажа
+	required int32  messageId  = 5; // Уникальный идентификатор запроса. Выставляется клиентом
+}
+
+// Ответ на сообщение запуска
+// Запуск модуля произведен: report = DONE
+// Указанного модуля нет в конфигурационном файле: report = ERR_LAUNCH_MODULE_NOT_FOUND
+// Указанный бинарный файл не существует: report = ERR_LAUNCH_BINARY_NOT_FOUND
+// Не удалось запустить модуль: report = ERR_LAUNCH_ERROR
+message ModuleLaunchResponse {
+	required Report report     = 1; // отчет о запуске
+	required string moduleName = 2; // показывает для какого модуля пришел отчет
+	optional string group      = 3; // показывать для какого модуля пришел отчет
+	optional int32  waitTime   = 4; // время ожидания запуска приложения в секундах (берется из конфигурационного файла запускаемых модулей)
+	required int32  messageId  = 5; // Уникальный идентификатор запроса. Соответствует идентификатору из ModuleLaunchRequest
+}
+
+// Результат запуска модуля
+// Удачный запуск (модуль подключился к системе): report = DONE
+// Модуль не запустился: report = ERR_LAUNCH_MODULE_TIMEOUT 
+// Неподдерживаемый протокол: report = ERR_MODULE_UNSUPPORTED_PROTOTCOL
+message ModuleLaunchResult {
+	required Report report     = 1; // отчет о запуске
+	required string moduleName = 2; // показывает для какого модуля пришел результат
+	optional string group      = 3; // показывает для какого модуля пришел результат
+	required int32  messageId  = 4; // Уникальный идентификатор запроса. Соответствует идентификатору из ModuleLaunchRequest
+}
+
+// Команда остановки модуля
+message ModuleStopRequest {
+	required string moduleName = 1; // Название модуля
+	optional string group      = 2; // Группа, к которой принадлежит узел сети
+	required int32  messageId  = 3; // Уникальный идентификатор запроса. Выставляется клиентом
+}
+
+// Ответ на сообщение остановки
+// Команда остановки отправлена в модуль: report = DONE
+// Модуль не подключен к системе: report = ERR_STOP_MODULE_NOT_FOUND 
+// Модуль не отвечает на команду: report = ERR_STOP_MODULE_NOT_RESPONSE
+message ModuleStopResponse {
+	required Report report     = 1; // отчет об остановке
+	required string moduleName = 2; // показывает для какого модуля пришел отчет
+	optional string group      = 3; // показывает для какого модуля пришел отчет
+	optional int32  waitTime   = 4; // время ожидания остановки приложения в секундах (получаем от модуля)
+	required int32  messageId  = 5; // Уникальный идентификатор запроса. Соответствует идентификатору из ModuleStopRequest
+}
+
+// Результат остановки модуля
+// Модуль отключен: report = DONE
+// Модуль не останавливается: report = ERR_STOP_MODULE_TIMEOUT
+message ModuleStopResult {
+	required Report report     = 1; // отчет об остановке
+	required string moduleName = 2; // показывает для какого модуля пришел результат
+	optional string group      = 3; // показывает для какого модуля пришел результат
+	required int32  messageId  = 4; // Уникальный идентификатор запроса. Соответствует идентификатору из ModuleStopRequest
+
+}
+
+// Статус модуля
+enum ModuleStatus {
+    MODULE_STOPPED = 1;
+}
+
+// Индикация на изменение состояния запущенного модуля
+message ModuleStatusIndication {
+    required ModuleStatus status   = 1;
+    required string moduleName     = 2;
+    optional string group          = 3;
+}

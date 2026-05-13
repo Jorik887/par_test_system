@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Пользовательские справочники" type="Удаление из пользовательского справочника" alias="remove_from_user_dict"  module="paragraf">
+
+	<group alias="version">
+		<!--Мажорная версия поднимается при потере обратной совместимости,
+			минорая - при любых изменениях-->
+		<spin_box name="Мажорная версия" alias="major" type="uint">0</spin_box>
+		<spin_box name="Минорная версия" alias="minor" type="uint">1</spin_box>
+	</group>
+
+	<text_field alias="user_table_name" name="Название справочника" />
+	
+	<!-- Выбор по названиям справочников. Если поле removed_row_ids и table_filters не заполнены то справочник будет очищен. -->
+	<repeater alias="removed_row_ids" name="Идентификаторы удаляемых строк">
+		<text_field alias="removed_row_id" name="Идентификатор"/>
+	</repeater>
+
+	<repeater alias="table_filters" name="Фильтрация по полям">
+		<text_field name="Поле" alias="column"></text_field>
+		<combo_box name="Условие" alias="condition">
+			<item>Равно</item>
+			<item>Не равно</item>
+			<item>Больше</item>
+			<item>Не больше</item>
+			<item>Меньше</item>
+			<item>Не меньше</item>
+		</combo_box>
+		<text_field name="Значение" alias="column_value"></text_field>
+	</repeater>
+
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed"></action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>
+

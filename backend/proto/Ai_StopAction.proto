@@ -1,0 +1,18 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Report.proto";
+
+// Отправка команды остановки приложения
+// Инициатор - УШД
+// Получатель - подлкючаемое СПО
+message StopActionRequest {
+}
+
+// Ответ на команду остановки приложения
+// В случае подтверждения остановки: report = DONE
+// В случае отказа от остановки: report = ERR_UNDEFINED, описание в report.description
+message StopActionResponse {
+	required Report report       = 1; // Отчет о выполнении
+	required int32  stoppingTime = 2; // Время, необходимое для остановки приложения, в секундах
+}

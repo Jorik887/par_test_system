@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Уведомления" type="Уведомление о событии в Параграфе" alias="skif.event.paragraf" module="paragraf">
+    <text_field name="Событие" alias="message" required="true"/>
+	<combo_box name="Тип события" alias="event_type">
+		<item>общая информация</item>
+                <item>важная информация</item>
+		<item>уведомление о выполнении</item>
+		<item>предупреждение</item>
+		<item>ошибка</item>
+	</combo_box>
+	<combo_box name="Категория события" alias="category_type">
+		<item>сообщение</item>
+		<item>событие по документу</item>
+	</combo_box>
+	<text_field name="Фильтр" alias="filter" required="false"/>
+	<group alias="event-details" flags="h"> <!--Информация о событии-->
+        <date alias="time" type='datetime'/> <!--Время возникновения(регистрации)-->
+        <text_field alias="name"/> <!--Имя, если не указано - берется имя документа-->
+        <text_field alias="description"/> <!--Краткое описание-->
+
+        <group alias="display"> <!--Отображение на стороне СПО Скиф, устанавливается по-умолчанию если не указано-->
+            <spin_box alias="level" type="uint" max="2">0</spin_box> <!--Больше - важнее-->
+            <check_box alias="notification" checked="false"/> <!--Уведомление-->
+            <check_box alias="sound" checked="false"/> <!--Звуковое оповещение-->
+            <check_box alias="journal" checked="true"/> <!--Запись в журнал-->
+			
+			<repeater alias="reactions" name="Возможные решения">
+				<text_field alias="id" flags="h"/> <!--id решения-->
+				<text_field alias="decision"/> <!--Решение-->
+				<text_field alias="description"/> <!--Описание-->
+				<text_field alias="event"/> <!--Событие-->
+				<spin_box alias="rating" type="uint" min="0" max="5"/> <!--Оценка решения-->				
+			</repeater>
+        </group>
+    </group>
+</document>

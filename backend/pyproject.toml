@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "paragraph-test-backend"
+version = "0.1.0"
+description = "Backend системы автоматизированного тестирования СПО 'Параграф'"
+authors = ["Arnold"]
+packages = [{ include = "src", from = "." }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+fastapi = "^0.115.0"
+uvicorn = {extras = ["standard"], version = "^0.30.0"}
+
+sqlalchemy = "^2.0.0"
+asyncpg = "^0.29.0"
+alembic = "^1.13.0"
+
+pydantic = "^2.8.0"
+pydantic-settings = "^2.4.0"
+
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.9"
+
+requests = "^2.32.0"
+cryptography = "^43.0.0"
+
+apscheduler = "^3.10.0"
+
+pytest = "^8.0.0"
+pytest-asyncio = "^0.23.0"
+pytest-cov = "^5.0.0"
+psycopg2-binary = "^2.9.11"
+bcrypt = "3.2.2"
+protobuf = "^6.33.1"
+pandas = "^2.3.3"
+openpyxl = "^3.1.5"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.0.0"
+isort = "^5.13.0"
+mypy = "^1.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

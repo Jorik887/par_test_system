@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Пользовательские справочники" type="Запись в пользовательский справочник" alias="insert_user_dict"  module="paragraf">
+
+	<group name="Версия" alias="version">
+		<!--Мажорная версия поднимается при потере обратной совместимости,
+			минорая - при любых изменениях-->
+		<spin_box name="Мажорная версия" alias="major" type="uint">0</spin_box>
+		<spin_box name="Минорная версия" alias="minor" type="uint">1</spin_box>
+	</group>
+
+	<text_field name="Название справочника" alias="user_table_name" required="true"></text_field>
+	
+	<repeater alias="table_values" name="Строки">		
+		<!--
+			Значения полей хранятся в неформализованных параметрах вида:
+			
+			Для текстовых значений, уникальных идентификаторов и ссылок(ссылка - uuid строки):
+			<text_field name="Наименование столбца"></text_field>
+			
+			Для целочисленных значений:
+			<spin_box name="Наименование столбца" type="int"></spin_box>
+
+			Для дробных значений:
+			<spin_box name="Наименование столбца" type="double"></spin_box>
+			
+			Для времени:
+			<date name="Наименование столбца" type="time" />
+			
+			Для времени и даты:
+			<date name="Наименование столбца" type="datetime" />
+			
+			Для флагов:
+			<check_box name="Наименование столбца"></check_box>
+
+			Для фигур на карте:
+			<coordinates type="poi" name="Наименование столбца"></coordinates>
+			
+			Для файлов:
+			<binary_param name="Наименование столбца"></binary_param>
+			или
+			<input_file name="Наименование столбца"></input_file>
+
+		 -->
+	</repeater>
+	
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<repeater alias="table_values_complited" name="Добавленные строки">	
+				<text_field name="id"></text_field>			
+			</repeater>
+			<repeater alias="table_values_failed" name="Не добавленные строки">	
+				<!--
+					Значения полей хранятся в неформализованных параметрах вида:
+					
+					Для текстовых значений, уникальных идентификаторов и ссылок(ссылка - uuid строки):
+					<text_field name="Наименование столбца"></text_field>
+					
+					Для целочисленных значений:
+					<spin_box name="Наименование столбца" type="int"></spin_box>
+
+					Для дробных значений:
+					<spin_box name="Наименование столбца" type="double"></spin_box>
+					
+					Для времени:
+					<date name="Наименование столбца" type="time" />
+					
+					Для времени и даты:
+					<date name="Наименование столбца" type="datetime" />
+					
+					Для флагов:
+					<check_box name="Наименование столбца"></check_box>
+
+					Для фигур на карте:
+					<coordinates type="poi" name="Наименование столбца"></coordinates>
+					
+					Для файлов (до версии 0.1):
+					<binary_param name="Наименование столбца"></binary_param>
+					или
+					<input_file name="Наименование столбца"></input_file>
+
+					Для файлов (начиная с версии 0.1):
+					<binary_param name="Наименование столбца"></binary_param>
+					или для небинарных файлов возвращается его id
+					<text_field name="Наименование столбца"></text_field>
+
+				 -->
+			</repeater>
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>
+

@@ -1,0 +1,54 @@
+syntax="proto2";
+package ai.proto;
+
+// Код отчета о выполнении
+enum ReportCode {
+    DONE                               =   0;    // Выполнено успешно
+    ERR_UNDEFINED                      =   1;    // Во время выполнения произошла неизвестная ошибка
+
+    // Ошибки хоста
+    ERR_PROTOCOL_VERSION_MISMATCH    = 100;      // Несовпадение версий протокола
+    ERR_UNSUPPORTED_PROTOCOL_VERSION = 101;      // Не поддерживаемая версия протокола
+    ERR_PARAMETERS_NOT_APPLIED       = 102;      // Параметры не были установлены
+    ERR_STATE_NOT_APPLIED            = 103;      // Состояние модуля не было установлено
+    ERR_MODULE_ALREADY_CONNECTED     = 104;      // модуль с таким именем уже подключен
+    ERR_NETWORK_OVERLOAD             = 105;      // Сеть перегружена, сообщения не принимаются
+
+	// Ошибки ЭДО
+	ERR_NOT_ENOUGH_DATA      = 150;   // Указаны не все требуемые поля
+	ERR_ID_MISMATCH          = 151;   // Документ с заданным идентификатором не найден
+	ERR_NOT_SUPPORTED_ACTION = 152;   // Запрашивается неподдерживаемое действие
+	ERR_INVALID_DOCUMENT	 = 153;   // Получен невалидный документ
+	ERR_ID_EXIST             = 154;   // Документ с таким id уже существует
+	ERR_CLIENT_MISMATCH		 = 155;   // Не найден участник документооборота
+	ERR_STATE_MISMATCH		 = 156;   // Состояние не найдено
+
+    // Ошибки передачи файлов
+    ERR_FILE_CANCELED   = 161;
+    ERR_FILE_NOT_FOUND  = 162;
+    FILE_INCOMPLETE     = 163;  // Показывает, что файл поступил не целиком (из-за проблем c однаправленным шлюзом), больше частей по этому файлу не будет
+
+    // Ошибки маршрутизации SendDocumentRequest
+    ERR_HOST_NOT_EXISTS = 170;
+
+	// Ошибки ОШС
+	ERR_ACCESS_DENIED   = 180;   // в подключении отказано
+    ERR_SESSION_OPENED  = 181;   // уже открыта сессия другого пользователя
+
+    // Ошибки удаленного запуска модулей
+    ERR_LAUNCH_MODULE_NOT_FOUND      = 190; // указанный запускаемый модуль не найден
+    ERR_LAUNCH_BINARY_NOT_FOUND      = 191; // отсутствует бинарный файл запускаемого модуля
+    ERR_LAUNCH_ERROR                 = 192; // ошибка запуска 
+    ERR_LAUNCH_MODULE_TIMEOUT        = 193; // модуль не запустился за указанное время
+    ERR_MODULE_UNSUPPORTED_PROTOTCOL = 194; // модуль использует неподдерживаемый протокол
+    ERR_STOP_MODULE_NOT_FOUND        = 195; // модуль не был найден
+    ERR_STOP_MODULE_NOT_RESPONSE     = 196; // модуль не отвечает
+    ERR_STOP_MODULE_TIMEOUT          = 197; // модуль не остановился за указанное время
+    ERR_MODULE_ALREADY_LAUNCHED      = 198; // модуль уже запущен 
+}
+
+// Отчет о выполнении
+message Report {
+    required ReportCode code           = 1 [default = DONE];  // Действие завершилось успешно, если code == DONE
+    optional string     description    = 2;                   // Детальный отчет о выполении. При ошибках, содержит подробное описание ошибки. Может быть пустым, если code == DONE
+}

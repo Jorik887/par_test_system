@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Диагностика" type="Ответ диагностической информации" alias="diagnostic_response">
+	<!-- Идентификатор узла -->
+	<text_field name="Идентификатор узла" alias="node_id" multiline="false" required="false"/>
+	<combo_box name="Состояние" alias="status" current="standard" required="true">
+		<item>Включен</item>
+		<item>Выключен</item>
+		<!-- В данном случае обязателен к заполнению список рекомендаций и описание проблемы -->
+		<item>Сбой</item>
+		<!-- В данном случае обязателен к заполнению описание проблемы -->
+		<item>Частично работоспособен</item>
+	</combo_box>
+	<text_field name="Описание проблемы" alias="description" multiline="false" required="false"/>
+	<!-- Перечень рекомендаций, для устранения неисправности -->
+	<repeater name="Рекомендации" alias="recommendations" required="false">
+		<text_field multiline="false" required="false"/>
+	</repeater>
+	<!-- Список параметров узла -->
+	<repeater name="Параметры" alias="parameters" required="false">
+		<text_field name="УШД" alias="parameter" multiline="false" required="false"/>
+		<text_field name="БД Событий" alias="parameter" multiline="false" required="false"/>
+		<text_field name="БД ЧТП" alias="parameter" multiline="false" required="false"/>
+		<text_field name="СПО Параграф" alias="parameter" multiline="false" required="false"/>
+		<text_field name="СПО RFPost" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Состояние ППУ" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Зарегистрировано МС" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Статус координат" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Температура ППУ" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Имя параметра" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Имя устройства" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Описание объекта" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Имя объекта" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Широта" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Долгота" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Высота" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Путевая скорость (GPS)" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Количество бортов" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Версия прошивки" alias="parameter" multiline="false" required="false"/>
+		<text_field name="" alias="parameter" multiline="false" required="false"/>
+	</repeater>
+	<repeater name="" alias="parameters" required="false">
+		<text_field name="Модули" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Основная база данных" alias="parameter" multiline="false" required="false"/>
+		<text_field name="База данных источников" alias="parameter" multiline="false" required="false"/>
+		<text_field name="База данных ЧТП и РЭО" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Параграф" alias="parameter" multiline="false" required="false"/>
+		<text_field name="GPS" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Задачи" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Дешифратор DMR" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Пеленгатор" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Температура" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Режим работы сервиса" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Количество заявок" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Количество успешных результатов" alias="parameter" multiline="false" required="false"/>
+		<text_field name="Количество результатов" alias="parameter" multiline="false" required="false"/>
+		<text_field name="" alias="parameter" multiline="false" required="false"/>
+	</repeater>
+	<label name="Идентификатор запроса" alias="request_id"/>
+</document>

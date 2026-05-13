@@ -1,0 +1,17 @@
+<document group="Пользовательские справочники" type="Отмена подписки на уведомления" alias="unsubscribe_dictionary_notification" module="paragraf">
+
+<text_field name="Название справочника" alias="user_table_name" required="true"/>
+
+<start_state id="initial" name="Принято">
+	<action button="Отправить ответ" state="done">
+		<text_field alias="info" name="Комментарий"/>
+	</action>
+	<action button="Отклонить" state="rejected">
+		<text_field alias="reason" name="Причина"/>
+	</action>
+</start_state>
+
+<final_state id="done" name="Завершено"/>
+<final_state id="rejected" name="Отклонено"/>
+
+</document>

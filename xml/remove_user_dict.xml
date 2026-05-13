@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Пользовательские справочники" type="Удаление пользовательского справочника" alias="remove_user_dict"  module="paragraf">
+
+	<repeater alias="user_table_names" name="Названия справочников для удаления">
+		<text_field name="Название справочника" alias="user_table_name" />
+	</repeater>
+	
+	
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<text_field alias="user_tables" name="Сообщение"/>
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>

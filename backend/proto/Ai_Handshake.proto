@@ -1,0 +1,72 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Report.proto";
+
+// Версия ПО
+message SoftwareVersion {
+	// Текущая версия протокола
+	enum ProtocolCurrentVersion {
+        CURRENT = 16; // Текущая версия протокола
+	}
+
+	// Минимально поддерживаемая версия протокола
+	enum ProtocolSupportedVersion {
+		MIN = 7; // Минимальная поддерживаемая версия
+	}
+
+	// версия протокола
+	required uint32 protocol_version_current        = 1;
+	required uint32 protocol_version_min_supported  = 2;
+
+	// Информация о модуле
+	optional string software_version = 11; // Версия модуля
+	optional string build_date_time  = 12; // Время сборки в строковом виде (для вывода в справке)
+	optional string software_name    = 20; // Имя модуля
+	repeated string capabilities     = 21; // Возможности модуля. Указывается для взаимодейтсвия с другими модулями
+}
+
+// Запрос на установление соеденения. Отправляется хостом после установления соедининия через сокет
+message HandshakeRequest {
+	required string          host_id      = 1;        // Идентификатор хоста из файла конфигурации запускаемого модуля
+	required SoftwareVersion host_version = 2;        // Версия ПО хоста
+}
+
+// Ответ на установление соеденения
+message HandshakeResponse {
+	required Report          report             = 1; // Отчет о доставке
+	required SoftwareVersion integrator_version = 2; // Версия ПО УШД
+}
+
+
+enum LoginOperation {
+	LOGIN  = 1; // пользователь авторизовался в системе
+	LOGOUT = 2; // пользователь завершил работу
+}
+
+// Запрос на выполнения входа в ОШС
+message LoginNodusRequest {
+	message LoginParams {
+		required string login    = 1;
+		required string password = 2;
+	}
+	required LoginOperation operation = 1; // тип операции
+	optional LoginParams login_params = 2; // параметры входа
+}
+
+// Ответ на выполнение входе
+message LoginNodusResponse {
+	required Report report = 1; // Отчет о доставке
+	optional string name   = 2; // имя пользователя
+	optional string role   = 3; // роль пользователя в системе
+	optional string device = 4; // название рабочего места
+        optional LoginOperation operation  = 5; // тип операции
+}
+
+// Сообщение, исходящее от УШД, сообщает о начале/завершении сессии
+message LoginNotification {
+	required LoginOperation operation  = 1; // тип операции
+	optional string name               = 2; // имя пользователя
+	optional string role               = 3; // роль пользователя в системе
+	optional string device             = 4; // название рабочего места
+}

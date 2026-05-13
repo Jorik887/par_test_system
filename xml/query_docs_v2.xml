@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Служебные" type="Запрос документов" alias="query_docs_v2">
+	<!-- Выбор по taskId-->
+	<repeater alias="task_id_rep" name="Выбор по номеру задачи">
+		<!-- *** Формирование условия между полями внутри репитера(между <data> в протодокументе) идет через OR *** -->
+		<text_field alias="task_id" name="Номер задачи"/>
+	</repeater>
+	
+	<!-- ### Формирование условия между репитерами через AND ### -->
+	
+	<!-- Выбор по documentId-->
+	<repeater alias="document_id_rep" name="Выбор по идентификаторам документов">
+		<!-- *** Формирование условия между полями внутри репитера(между <data> в протодокументе) идет через OR *** -->
+
+		<text_field alias="document_id" name="Идентификатор документа"/>
+	</repeater>
+	
+	<!-- ### Формирование условия между репитерами через AND ### -->
+	
+	<!-- Выбор по number-->
+	<repeater alias="document_numbers_rep" name="Выбор по порядковым номерам документов">
+		<!-- *** Формирование условия между полями внутри репитера(между <data> в протодокументе) идет через OR *** -->
+		<spin_box alias="document_number_min" type="uint" min="0" max="4294967295" name="Номер больше, чем"/>
+		<spin_box alias="document_number_max" type="uint" min="0" max="4294967295" name="Номер меньше, чем"/>
+	</repeater>
+	
+	<!-- ### Формирование условия между репитерами через AND ### -->
+	
+	<!-- Выбор по датам. Дата окончания выбирается влючительно -->
+	<repeater alias="docs_date" name="Выбор по датам">
+		<!-- *** Формирование условия между полями внутри репитера(между <data> в протодокументе) идет через OR *** -->
+		<date name="Начало" type="datetime" alias="docs_date_start"/>
+		<date name="Окончание" type="datetime" alias="docs_date_end"/>
+	</repeater>
+	
+	<!-- ### Формирование условия между репитерами через AND ### -->
+	
+	<!-- Выбор по типам документов. В типах документов используются alias -->
+	<repeater alias="docs_alias" name="Типы документов">
+		<!-- *** Формирование условия между полями внутри репитера(между <data> в протодокументе) идет через OR *** -->
+		<text_field name="Наменование типа" alias="doc_alias" />
+	</repeater>
+	
+	<!-- ### Формирование условия между репитерами через AND ### -->
+	
+	<repeater alias="docs_parameter_filters" name="Фильтрация по полям">
+		<!-- *** Формирование условия между полями внутри репитера(между <data> в протодокументе) идет через OR *** -->
+		<text_field name="Наименование" alias="parameter_name"></text_field>
+		<text_field name="Псевдоним" alias="parameter_alias"></text_field>
+		<combo_box name="Условие" alias="parameter_condition">
+			<item>Равно</item>
+			<item>Не равно</item>
+			<item>Больше</item>
+			<item>Не больше</item>
+			<item>Меньше</item>
+			<item>Не меньше</item>
+		</combo_box>
+
+		<!--
+			Неформализованные параметры вида:
+			<text_field name="Значение" alias="parameter_value">Значение</text_field>
+				name - наименование искомого параметра;
+				alias - псевдоним искомого параметра;
+		 -->
+	</repeater>
+
+	<!-- ### Формирование условия между репитерами через AND ### -->
+
+	<repeater alias="docs_tags" name="Теги документов">
+		<!-- *** Формирование условия между полями внутри репитера(между <data> в протодокументе) идет через OR *** -->
+		<text_field name="Наименование тега" alias="doc_tag" />
+	</repeater>
+
+
+
+
+	<combo_box alias="docs_order" name="Порядок выбора">
+        <item>С начала</item>
+    	<item>С конца</item>
+     </combo_box>
+
+	<!-- Выбор по участниками документооборота. -->
+	<repeater alias="docs_executer" name="Участники документооборота">
+		<text_field name="Идентификатор пользователя" alias="doc_executer_id" />
+		<text_field name="Идентификатор ПО" alias="doc_executer_hostid" />
+		<combo_box name="Тип участника" alias="docs_executer_type">
+			<item>author</item> 
+			<item>executer</item>
+		</combo_box>
+	</repeater>
+
+	<!-- Ограничить выбор количеством документов -->
+	<spin_box alias="docs_limit" max="1000" min="1" name="Ограничение вывода" type="uint" uitype="spinbox"/>
+	<check_box alias="send_files" checked="false" name="Отправлять файлы"></check_box>
+
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<!-- При успешном выборе в ответ приходит оцениваемое количество документов, содержащихся в базе по заданному запросу. -->
+			<spin_box alias="complete_count" max="1000" min="1" name="Количество документов" type="uint" uitype="spinbox"/>
+			<repeater alias="documents" name="Документы">
+				<text_field alias="id_doc" name="Идентификатор документа в БД"/>
+				<spin_box alias="doc_number" type="uint" min="0" max="4294967295" name="Порядковый номер документа в БД"/>
+				<document_param alias="doc"/>
+				<input_file multiple="true" alias="doc_files"/>
+			</repeater>
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>

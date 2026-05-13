@@ -1,0 +1,223 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Report.proto";
+import "Ai_Common.proto";
+import "Ai_Documents.proto";
+
+//// Протокол управления картографическим компонентом PoiEdit 
+//// Компонент - картографический компонентом PoiEdit
+//// Клиент - приложение, использующее компонент (например, АИнтегратор, Скиф и др)
+//// Сообщения, отправляемые от клиента компоненту:  PoiEditRequest
+//// Сообщения, отправляемые от компонента клиенту:  PoiEditResponse, PoiEditNotify
+
+/// Путь к документу
+/// используется в дереве документов в PoiEdit на гуе
+/// Пример: Распоряжения/Боевые распоряжения/Важные
+/// Путь в дереве формируется при вызове DRAW с указанием PoiSource::document_path, при повторном нанесении документа с другим путем документ перекладывается в эту папку.
+/// Возможные действия с путями:
+/// - ViewportAction с  DOCUMENTS_BY_PATHS_TO_FIT (позиционирование карты по POI документов по заданным путям);
+/// - ClearAction с  DocumentsByDocumentPath (Очистка карты и дерева от документов и POI, содержащихся по указанным путям);
+/// - DocumentsVisibleAction c document_path_visible (установка видимости POI документов, содержащихся по указанным путям);
+/// - DocumentsPathsRemoveAction - удаление заданных путей из дерева с очисткой;
+/// Документы, не имеющие привязки к DocumentPath заносятся в спец. папку: Отдельные документы
+message DocumentPath {
+    // Имя папки
+    required string node_name = 1;
+    // Описание (tooltip)
+    optional string node_description = 2;
+    // Вложенная папка
+    optional DocumentPath child_node = 3;
+}
+
+/// Действия по позиционированию карты
+/// Для DrawAction чтобы позиционировать по poi_source используйте DrawAction::positioning_for_contour
+message ViewportAction {
+    enum OneOfType {
+        VIEWPORT_SETTINGS = 1;
+        POSITIONS_TO_FIT = 2;
+        DOCUMENTS_TO_FIT = 3;
+        DOCUMENTS_BY_PATHS_TO_FIT = 4;
+    }
+    message ViewportSettings {
+        // центр карты
+        required Position center    = 1; 
+        // знаменатель масштабы карты (например для карты 1:100000 равно 100000, не путать с zoom)
+        optional uint32 scale       = 2;
+    }
+    required OneOfType type = 1;
+    /// позиционировать карту по ViewportSettings
+    optional ViewportSettings settings  = 2;
+    /// позиционировать карту по Position
+    repeated Position positions_to_fit  = 3;
+    /// позиционировать карту по Poi из нанесенных ранее документов, соотвествующим идентификаторам из списка documents_to_fit
+    repeated UUID documents_to_fit  = 4;
+    /// позиционировать карту по Poi из нанесенных ранее документов, находящихся в указанных путях
+    repeated DocumentPath documents_by_paths_to_fit  = 5;
+}
+
+/// Источник данных POI
+message PoiSource {
+    repeated Document documents	= 1; // Документы
+    repeated SendActionRequest send_action_requests = 2; // действия над документом
+    // Указывается только для documents (1),
+    // если путь для документа не указан кладется в папочку Отдельные документы
+    optional DocumentPath document_path = 3;
+}
+
+/// Нанесение обстановки на карту
+message DrawAction {
+	required PoiSource poi_source = 1;
+	optional bool positioning_for_contour = 2;
+}
+
+/// Очистка
+message ClearAction {
+    /// Режим очистки
+    enum Mode {
+        /// Удаление всех объектов карты
+        All = 0;
+        /// Удаление всех объектов документов и объектов, прикрепленных к данным документам SendActionRequest
+        DocumentWithAll = 1;
+        /// Удаление всех объектов документов и объектов, содержащейся по указанному пути
+        DocumentsByDocumentPath = 2;
+    }
+    optional Mode mode = 1;
+    repeated UUID document_ids = 2;
+    repeated DocumentPath document_paths = 3;
+}
+
+// 
+message SelectExistentPoisMode {
+
+	message Condition {
+		// Мин кол-во возвращаемых POI
+		optional int32 min_poi_count = 1;
+		// Макс кол-во возвращаемых POI, не менее min_poi_count
+		optional int32 max_poi_count = 2;
+	}
+	optional Condition condition = 1;
+}
+
+message SinglePoiMode {
+	message Condition {
+		// Мин кол-во возвращаемых точек 
+		// для маркера всегда = 1, для линии - не менее 2, для зоны - не менее 3
+		optional int32 min_position_count = 1;
+		// Макс кол-во возвращаемых точек 
+		// для маркера всегда = 1, для остальных типов не менее min_position_count
+		optional int32 max_position_count = 2;	
+	}
+	optional Condition condition = 1;
+	// Образец для нанесения (Передаваемые в POI координаты игнорируются)
+	// Условием не является
+	optional POI sample	= 2;
+}
+
+/// Взятие данных
+message GetAction {
+	/// Режим запрашиваемых данных
+	enum Mode {
+		// выбираем POI с помощью выделения на карте
+		// возвращаются данные выделенных POI
+		SELECT_EXISTENT_POIS = 1;
+		// клацая по карте, рисуем новую POI. После завершения POI удаляется с карты
+		// возвращаются данные одной POI
+		SINGLE_POI    		 = 2;
+                // отклонить выполнение GetAction
+                REJECT = 3;
+	}
+	// Режим запрашиваемых данных
+    required Mode mode                            				= 1;
+	// Настройки для режимов, одно из, в соответствии с режимом
+	// Настройки режима SELECT_EXISTENT_POIS
+    optional SelectExistentPoisMode select_existent_pois_mode	= 2;
+	// Настройки режима SINGLE_POI
+	optional SinglePoiMode single_poi_mode						= 3;
+	// Принять немедленно (не дожидаясь нажатия кнопки "Применить" при выполнении заданных условий)
+	optional bool accept_when_conditions_are_met 				= 10;
+}
+
+/// Установка видимости POI ранее выведенных на карту документов
+/// Если заданы оба тега (document_visible, document_path_visible)
+/// видимость для путей устанавливает вначале
+message DocumentsVisibleAction {
+    message DocumentVisible {
+        // id документа
+        required UUID id = 1;
+        // видимость POI документа
+        required bool visible = 2;
+    }
+    message DocumentPathVisible {
+        // id документа
+        required DocumentPath documents_path = 1;
+        // видимость POI документов, находящихся по указанному пути
+        required bool visible = 2;
+    }
+    repeated DocumentVisible document_visible = 1;
+    repeated DocumentPathVisible document_path_visible = 2;
+}
+
+/// Удалить пути к документам с содержащимися в них документами и POI
+message DocumentsPathsRemoveAction {
+    repeated DocumentPath document_paths = 1;
+}
+
+/// Отправка управляющего воздействия, передается от клиента компоненту, в ответ клиенту отправляется PoiEditResponse
+message PoiEditRequest {
+	/// Тип действия с картой, одно из
+        enum OneOfType {
+                DRAW	= 1; 	// Нанести POI
+                CLEAR   = 2;	// Действия по очистке карты
+                GET 	= 3;	// Считать POI
+                VIEWPORT= 4;    // Установить настройки viewport
+                DOCUMENTS_VISIBLE = 5; // Действия по установке видимости POI документов
+                DOCUMENTS_PATHS_REMOVE = 6; // Действия по удалению путей документов
+	}
+	required OneOfType type         	= 1; // Тип действия с картой
+	optional DrawAction draw_action		= 2;
+	optional ClearAction clear_action	= 3;
+	optional GetAction get_action           = 4;
+	optional ViewportAction viewport_action = 5;
+	optional DocumentsVisibleAction documents_visible_action = 6;
+        optional DocumentsPathsRemoveAction documents_paths_remove_action = 7;
+        optional UUID id = 8;
+}
+
+/// Ответ на PoiEditRequest, передается от компонента клиенту
+message PoiEditResponse {
+	required Report report = 1; // Отчет о выполнении
+        optional UUID request_id = 2;
+}
+
+/// Оповещения карты ----------------------------------------------------------------------------
+/// Выход из режима взятия точек с карты
+message GetActionEndedNotify {
+	// Код возврата
+	enum ResultCode {
+			// Пользователь закончил ввод данных, нажал кнопку "Применить"
+			ACCEPTED	= 1;
+			// Пользователь закончил ввод данных, нажал кнопку "Отмена"
+			REJECTED	= 2;
+	}
+	// Возвращаемые данные
+	message ResultData {
+		required GetAction.Mode mode = 1;
+		repeated POI pois           = 2;
+	}
+	required ResultCode result_code	= 1;
+	optional ResultData data		= 2;
+}
+
+/// Оповещение клиента о событиях карты, передается от компонента клиенту
+message PoiEditNotify {
+    enum OneOfType {
+    /// Выход из режима взятия точек с карты
+        GET_ACTION_ENDED    = 1;
+    }
+    required OneOfType type = 1;
+    optional GetActionEndedNotify get_action_ended_notify   = 2;
+    optional UUID request_id = 3;
+}
+
+

@@ -1,0 +1,135 @@
+syntax="proto2";
+package ai.proto;
+
+message SystemTime {
+    required int64 timestamp = 10; // UNIX time с миллисекундами.
+                                   // Например, дата 21.01.2019 14:25:30.450, будет предствалена как 1548080730450
+}
+
+// UUID
+message UUID {
+    required bytes data = 1;
+}
+
+// идентификатор пользователя
+message UserId {
+    optional UUID   id     = 1;  // идентификатор сети, если не указан пользователь находиться в локальной сети
+                                 // для автора это поля интегратор заполнит сам
+    optional string hostId = 2;  // идентификатор подключаемого ПО(модуля)
+    optional bool   hardware_client = 3; // Показывает, что пользователь находится в "железной" сети. Заполняется УШД при отправке в СПО
+    optional string group_name = 4; // Имя группы
+    optional string user_name = 10; // имя пользователя (будет заполнено ИШД, если пользователь находится в "деревянной" сети)
+    optional string user_role = 11; // роль пользователя (будет заполнено ИШД, если пользователь находится в "деревянной" сети)
+    optional string user_rank = 12; // звание пользователя (будет заполнено ИШД, если пользователь находится в "деревянной" сети)
+    optional string software_name = 13; // название приложения (будет заполнено ИШД при подготовке документа)
+}
+
+// описание прикрепленного файла
+message FileInfo {
+    required UUID   id   = 2;  // уникальный идентификатор файла
+    required string name = 3;  // имя файла
+    required uint64 size = 4;  // размер файла
+
+    optional string path 		= 5; // путь к файлу
+    optional bytes  data 		= 6; // deprecated
+    optional string session_id 	= 7; // deprecated
+    optional bool is_need_remove = 8; // если файл после передачи нужно удалить
+}
+
+// географические координаты, указываются в формате WGS84
+message Position {
+    required double latitude  = 1;
+    required double longitude = 2;
+    optional double altitude  = 3; // указывается в метрах
+}
+
+// Тип источника иконки
+message IconSourceType {
+	message RscKey {
+		required string filename = 1;     // имя файла классификатора
+		required string object_key  = 2;  // ключ объекта из классифиактора filename
+	}
+	/// Альтернатива - одно из просмотр с 1.
+	optional int32 internal_code  = 1; // соотвествует внутренней нумерацией QtTacticalMap
+    optional string internal_key  = 2; // соотвествует строковому наименованию Tmc
+	optional RscKey rsc_key       = 3; // соотвествует объекту из подгружаемого классификатора (rsc)
+}
+
+// Кластер точек интереса (POIs).
+// При уменьшении масштаба карты на месте рядом стоящих значков (находящихся в кластерах) отображается окружность ("пирожок"),
+// в которой в секторах заданного цвета POICluster::color отображается кол-во значков в кластере
+// Группировка в кластеры допускается только для MarkerPoint
+message PoiCluster {
+    required string name    = 1; // наименование кластера
+    required string color   = 2; // цвет кластера
+}
+
+// Зона интереса - маркер
+message MarkerPoint {
+    required Position point      = 1; // положение маркера
+    optional string   color      = 2; // цвет маркера в hex формате (#ff8000)
+    optional IconSourceType icon_source_type  = 3; // тип иаркера
+    optional PoiCluster cluster = 10; // кластер
+}
+
+// Зона интереса - линия
+message LinePoint {
+    repeated Position points     = 1; // список точек
+    optional string   lineColor  = 2; // цвет линии
+    optional IconSourceType icon_source_type  = 3; // тип маркера в опорных точках
+    optional string   iconColor  = 4; // цвет опорных точек
+}
+
+// Зона интереса - полигон
+message AreaPoint {
+    repeated Position points     = 1; // список точек
+    optional bool     filled     = 2; // область должна быть залита
+    optional string   fillColor  = 3; // цвет заливки
+    optional string   lineColor  = 4; // цвет линии
+    optional IconSourceType icon_source_type  = 5; // тип маркера в опорных точках
+    optional string   iconColor  = 6; // цвет опорных точек
+}
+
+// Зона интереса - окружность
+message EllipsePoint {
+    required Position center     = 1; // центр окружности
+    required uint32   h_radius   = 2; // радиус, м по горизонтали
+    required uint32   v_radius   = 3; // радиус, м по вертикали
+    optional double   rotate     = 4; // угол поворота эллипса в градусах
+    optional bool     filled     = 5; // область должна быть залита
+    optional string   fillColor  = 6; // цвет заливки
+    optional string   lineColor  = 7; // цвет линии
+    optional IconSourceType icon_source_type = 8; // тип маркера в центре окружности
+    optional string   iconColor  = 9; //цвет опорных точек
+}
+
+// пеленг
+message Bearing {
+    required Position location   = 1; // координаты поста
+    required double course       = 2; // направление, в градусах
+    optional string lineColor    = 3; // цвет пеленга
+    optional double distance     = 4; // расстояние до объекта пеленгования, в м
+}
+
+// точка интереса
+message POI {
+    enum Type {
+        MARKER_POINT  = 1;  // точечный объект
+        LINE_POINT    = 2;  // линия
+        AREA_POINT    = 3;  // область
+        ELLIPSE_POINT = 4;  // овал
+        BEARING       = 5;  // пеленг
+    }
+    required Type type            = 1;
+    optional string name          = 2;  // название
+    optional string subName       = 21; // доп. название
+    optional string description   = 3;  // подробное описание
+    optional uint32 parameterId   = 4;  // идентификатор параметра, к которому привязана данная точка
+    optional bool   valid         = 20; // показывает, что POI задан
+
+    optional MarkerPoint marker   = 5;
+    optional LinePoint   line     = 6;
+    optional AreaPoint   area     = 7;
+    optional EllipsePoint ellipse = 8;
+    optional Bearing     bearing  = 9;
+}

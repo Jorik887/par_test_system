@@ -1,0 +1,21 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Report.proto";
+import "Ai_Parameters.proto";
+
+// Установка параметров поста
+// При передаче HOST->INTEGRATOR: Задаются начальные значения параметров или изменения значений параметров в процессе работы поста
+// При передаче INTEGRATOR->HOST: Задаются измененые оператором значения параметров, которые должны быть установлены на посте
+message SetParametersRequest {
+	repeated Parameter parameters = 1;
+}
+
+// Ответ на установку параметров поста. Возможны три варианта:
+// 1. Если report.code() == DONE, значит параметры были успешно установлены
+// 2. Если report.code() != DONE и parameters не заданы, значит параметры не были установлены и их значения остались прежними
+// 3. Если report.code() != DONE и parameters заданы, начит параметры были установлены частично, а их валидные значения содержатся в parameters
+message SetParametersResponse {
+	required Report    report 		= 1;
+	repeated Parameter parameters 	= 2;
+}

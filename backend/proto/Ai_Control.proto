@@ -1,0 +1,39 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Report.proto";
+
+// Управляющее воздействие от Интегратора
+message ControlAction {
+	enum Type {
+		CA_KILL_PROGRAM   = 1;  // Завершить работу модуля
+		CA_RAISE_WINDOW   = 2;  // Показать рабочее окно модуля поверх всех окон
+		CA_START_WORK     = 3;  // Запустить текущий режим
+		CA_STOP_WORK      = 4;  // Остановить текущий режим
+	}
+
+	required Type     type         = 1; // Тип управляющего воздействия
+	required string   card_id      = 2; // Идентификатор карты, с которой было отправлено управлюящее воздействие
+}
+
+// Отправка управляющего воздействия
+message ControlActionRequest {
+	required ControlAction action = 1; // Управляющее воздействие
+}
+
+// Ответ на управляющее воздействие
+message ControlActionResponse {
+	required Report        report                = 1; // Отчет о выполнении
+}
+
+// Установка режима работы поста
+message SetWorkModeRequest {
+	required string work_mode_id = 1; // Идентификатор режима работы, который нужно установить на посте
+	optional string card_id      = 2; // Идентификатор карты (Если отправляется от Интегратора, то означает id карты, с которой отправлена команда. Если отправляется от хоста, то означает на какой карточке надо установить режим, если не задано, режим устанавливается на всех карточках)
+}
+
+// Ответ на установку режима работы поста
+message SetWorkModeResponse {
+	required string work_mode_id = 1; // Установленный режим работы. Если report.code() == DONE, должен быть равен work_mode_id из request
+	required Report report       = 2; // Отчет о выполении
+}

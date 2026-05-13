@@ -1,0 +1,87 @@
+syntax="proto2";
+package ai.proto.facility;
+
+import "Ai_Common.proto";
+
+// Комплекс описывается набором оборудования, объединенного в группы.
+// В топологии комплекса выделяется 3 различных структуры:
+//   АРМ (Unit) - ПК с установленной УШД (в большинстве случаев управляется оператором)
+//   Оборудование (Hardware) - аппаратная единица, без установленной УШД. Например: камаз, самолёт, ВБС
+//   Группа (Group) - логическая единица комплекса, объединяющая в себе остальные объекты
+//
+// В описании комплекса должна быть корневая группа
+
+
+// Идентификатор узла (machine_id из основного протокола)
+message UnitId {
+	required UUID value = 1;
+}
+
+// Описание узла сети (АРМ)
+message Unit {
+	required UnitId unit_id     = 1;
+	required string name        = 2;
+	optional string description = 3;
+}
+
+message Units {
+    repeated Unit units = 1;
+}
+
+message GroupId {
+	required UUID value = 1;
+}
+
+// описание группы (логическая структурная единица)
+message Group {
+	required GroupId group_id    = 1;   // уникальный идентификатор группы
+	required string  name        = 2;   // название
+	optional string  description = 3;   // описание
+
+	repeated GroupId slaves      = 11;  // дочерние группы 
+	repeated UnitId  units       = 12;  // список АРМ
+	repeated HardwareId hardware = 13;  // список оборудования
+}
+
+// Список групп
+message Groups {
+	required GroupId  head   = 1;  // Корневая группа
+	repeated Group    groups = 2;  // Плоский список групп
+}
+
+message HardwareId {
+	required UUID value = 1;
+}
+
+// описание оборудования 
+message Hardware {
+	required HardwareId hardware_id = 1;
+	required string     name        = 2;
+}
+
+message HardwareList {
+	repeated Hardware hardware = 1;
+}
+
+
+// Описание комплекса
+message Facility {
+	required Groups       groups   = 1;  // группы
+	required Units        units    = 2;  // АРМы
+	required HardwareList hardware = 3;  // оборудование
+}
+
+// Запрос описания комплекса
+message FacilityRequest {
+
+}
+
+// Выдача описания комплекса
+message FacilityResponse {
+	required Facility facility = 1;
+}
+
+// Сообщение об изменении в комплексе (формируется самой УШД, без запроса)
+message FacilityIndication {
+	required Facility facility = 1;
+}

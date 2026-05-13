@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Уведомления" type="Реакция на уведомление" alias="skif.event.reaction" file_attachments="false">    
+	<repeater alias="documents_types" name="Реакция на уведомление">
+		<text_field alias="decision" name="Принятое решение"/> <!--Решение-->
+	</repeater>	
+</document>

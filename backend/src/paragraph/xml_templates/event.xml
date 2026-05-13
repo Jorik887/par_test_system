@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document alias="event_with_action">
+    <!--Произвольное содержимое документа-->
+    <group alias="event-details" flags="h"> <!--Информация о событии-->
+        <date alias='time' type='datetime'/> <!--Время возникновения(регистрации)-->
+        <text_field alias='name'/> <!--Имя, если не указано - берется имя документа-->
+        <text_field alias='description'/> <!--Краткое описание-->
+
+        <group alias="display"> <!--Отображение на стороне СПО Скиф, устанавливается по-умолчанию если не указано-->
+            <spin_box alias="level" type="uint" max="2">0</spin_box> <!--Больше - важнее-->
+            <check_box alias="notification" checked="false"/> <!--Уведомление-->
+            <check_box alias="sound" checked="false"/> <!--Звуковое оповещение-->
+            <check_box alias="journal" checked="true"/> <!--Запись в журнал-->
+			
+			<repeater alias="reaction" name="Возможные решения">
+				<text_field alias="id" flags="h"/> <!--id решения-->
+				<text_field alias="decision"/> <!--Решение-->
+				<spin_box alias="rating" type="uint" max="5"/> <!--Оценка решения-->
+			</repeater>
+        </group>
+    </group>
+    <!--Произвольное содержимое документа-->
+</document>

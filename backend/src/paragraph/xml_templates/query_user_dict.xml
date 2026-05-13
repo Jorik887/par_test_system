@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Пользовательские справочники" type="Запрос пользовательских справочников" alias="query_user_dict">
+
+	<!-- Выбор по названиям справочников. Если поле не заполнено то будут выбраны все. -->
+	<repeater alias="user_table_names" name="Названия справочников">
+		<text_field name="Название справочника" alias="user_table_name" />
+		
+		<repeater alias="joined_tables" name="Связываемые таблицы">
+			<text_field name="Название связываемого справочника" alias="joined_table_name" />
+			<text_field name="Название ссылаемой колонки" alias="joined_column_name" />
+		</repeater>
+		
+	</repeater>
+
+
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<!-- При успешном выборе в ответ приходят все документы из выбраных справочников. -->
+			<repeater alias="user_tables" name="Cправочники">
+				<table name="Cправочник"> 
+					<column name="Столбец 1"/> 
+					<column name="Столбец 2"/> 
+				</table>
+			</repeater>
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>
+

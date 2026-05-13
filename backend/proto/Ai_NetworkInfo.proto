@@ -1,0 +1,79 @@
+syntax="proto2";
+package ai.proto;
+
+import "Ai_Common.proto";
+
+// Информация о подключаемом модуле
+message ModuleInfo {
+	required string id              = 1; // идентификатор софта. Например, rfpost (hostname)
+	optional string version         = 2; // версия софта. Например, 2.5.1-613
+	optional string name            = 3; // название софта. Например, Дальномерный вычислитель
+	repeated string capabilities    = 4; // возможности софта. Например, [calculate, netgps]
+	optional string alias_id        = 5; // псевдоним софта. Например, rfpost
+	optional bool authorized        = 6 [default = false]; // модуль выполнил вход
+	optional bool online            = 7; // показывает, что данный модуль включен
+	optional string client_id       = 8; // идентификатор клиента, который авторизовался через этот модуль
+	optional SystemTime last_online = 9; // время последней активности
+}
+
+// Информация о рабочем месте
+message MachineInfo {
+	required string machine_id    = 1; // Идентификатор рабочего места
+	optional string machine_name  = 2; // Имя рабочего места
+	repeated ModuleInfo modules   = 3; // Список модулей, подключенных на данном рабочем месте
+	optional bool localhost       = 4; // Показывает, что мы подключены к УШД на данном рабочем месте
+	optional string group_name    = 5; // Название группы, в которую входит данное рабочее место
+	optional bool online          = 6; // Показывает, что данное рабочее место подключено к сети УШД
+	optional string ip_address    = 7; // IP-адрес рабочего места
+	optional string machine_alias = 8; // Псевдоним машины для использования в скриптах клиентских ПО
+}
+
+// Сообщение от УШД при изменении списка модулей в системе
+message ModuleListIndication {
+	repeated MachineInfo list = 1; // Список рабочих мест
+}
+
+// Запрос списка модулей
+message ModuleListRequest {
+	optional string machine_id = 1; // Если указано одно из рабочих мест, будут возвращены только его модули
+}
+
+// Ответ со списком модулей в системе
+message ModuleListResponse {
+	repeated MachineInfo list = 1;
+}
+
+// Описание пользователя системы (ОШС)
+message UserInfo {
+	enum Status {
+		ONLINE  = 1;  // В сети
+		OFFLINE = 2;  // Не в сети
+		AWAY    = 3;  // Отошёл
+	}
+
+	required string user_id       = 1; // идентификатор пользователя
+	optional string user_name     = 2; // имя пользователя
+	optional string user_role     = 3; // роль пользователя
+	optional string user_rank     = 10; // звание/должность пользователя
+	repeated string superiors     = 4; // список идентификаторов вышестоящих пользователей (начальники)
+	repeated string subordinates  = 5; // список идентификаторов нижестоящих пользователей (подчиненные)
+	repeated string machines      = 6; // список рабочих мест, на которых присутствует пользователь (он может быть залогинен на нескольких машинах)
+	optional bool localhost       = 7; // Показывает, что данный пользователь выполнил вход на текущей УШД
+	optional Status status        = 8; // Статус пользователя
+	optional SystemTime away_time = 9; // Время наступления статуса AWAY
+}
+
+// Сообщение от УШД при изменении списка авторизованных пользователей в системе
+message UserListIndication {
+	repeated UserInfo list = 1; // Список пользователей
+}
+
+// Запрос списка авторизованных пользователей
+message UserListRequest {
+	optional string user_id = 1; // Если указан один из пользователей, будут возвращены только его данные
+}
+
+// Ответ со списком авторизованных пользователей
+message UserListResponse {
+	repeated UserInfo list = 1;
+}

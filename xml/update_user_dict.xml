@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Пользовательские справочники" type="Изменение данных в пользовательском справочнике" alias="update_user_dict"  module="paragraf">
+
+	<text_field name="Название справочника" alias="user_table_name" required="true"></text_field>
+	
+	<repeater alias="user_table_rows" name="Строки" required="true">	
+		<text_field name="Идентификатор строки" alias="table_row_uuid" required="true"></text_field>
+		
+		<repeater alias="table_filters" name="Фильтрация по полям">
+			<text_field name="Поле" alias="column"></text_field>
+			<combo_box name="Условие" alias="condition">
+				<item>Равно</item>
+				<item>Не равно</item>
+				<item>Больше</item>
+				<item>Не больше</item>
+				<item>Меньше</item>
+				<item>Не меньше</item>
+			</combo_box>
+			<text_field name="Значение" alias="column_value"></text_field>
+		</repeater>
+		
+		
+		<group alias="table_values" name="Значение столбцов" required="true">		
+			<!--
+				Значения полей хранятся в неформализованных параметрах вида:
+				
+				Для текстовых значений, уникальных идентификаторов и ссылок(ссылка - uuid строки):
+				<text_field name="Наименование столбца"></text_field>
+				
+				Для целочисленных значений:
+				<spin_box name="Наименование столбца" type="int"></spin_box>
+
+				Для дробных значений:
+				<spin_box name="Наименование столбца" type="double"></spin_box>
+				
+				Для времени:
+				<date name="Наименование столбца" type="time" />
+				
+				Для времени и даты:
+				<date name="Наименование столбца" type="datetime" />
+				
+				Для флагов:
+				<check_box name="Наименование столбца"></check_box>
+
+				Для фигур на карте:
+				<coordinates type="poi" name="Наименование столбца"></coordinates>
+				
+				Для файлов:
+				<binary_param name="Наименование столбца"></binary_param>
+				или
+				<input_file name="Наименование столбца"></input_file>
+				
+			 -->			 		 
+		</group>
+	</repeater>
+	
+
+	
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>
+

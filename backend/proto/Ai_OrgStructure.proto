@@ -1,0 +1,121 @@
+syntax="proto2";
+package ai.proto.organization;
+
+import "Ai_Common.proto";
+
+// Идентификатор человека (UserId из основного протокола)
+message EmployeeId {
+	required UUID value = 1;
+}
+
+// Описание дополнительных данных человека
+message EmployeeExtraData {
+    required string key = 1;           // Ключ
+    required string name = 2;          // Человекочитаемое имя
+    optional string string_value = 3;  // Строковое значение
+}
+
+// Конкретный человек
+message Employee {
+	required EmployeeId employee_id = 1;  // уникальный идентификатор
+
+	required string name     = 11;   // имя
+	required string surname  = 12;   // фамилия
+	required string lastname = 13;   // отчество
+
+	repeated EmployeeExtraData extra = 20;   // данные в формате ключ/значение
+}
+
+message Employees {
+	repeated Employee employees = 1;
+}
+
+// Идентификатор должности
+message PositionId {
+	required UUID value = 1;
+}
+
+// Должность, уникальная позиция в организации
+message Position {
+	required PositionId position_id = 1;  // уникальный номер должности
+	required string     name        = 2;  // название должности
+	optional string     description = 3;  // описание должности
+
+	repeated PositionId slaves      = 11; // Подчиненные, может быть не заполнено
+	optional SpecialtyId specialty  = 13; // Идентификатор специальности, может отсутствовать
+
+	optional EmployeeId appointed_employee = 21; // Назначенный на должность сотрудник (может быть не заполнено)
+
+	// Здесь далее будут появляться дополнительные сообщения, характеризующие должность
+}
+
+// Перечень должностей
+message Positions {
+	required PositionId head      = 1;  // Корневая должность, фактически руководитель организации
+	repeated Position   positions = 2;  // Плоский список должностей
+}
+
+// Идентификатор подразделения
+message DepartmentId {
+	required UUID value = 1;
+}
+
+// Подразделение
+message Department {
+	required DepartmentId department_id = 1;  // уникальный номер подразделения
+	required string       name          = 2;  // название
+	optional string       description   = 3;  // описание
+
+	repeated DepartmentId slaves        = 11; // Нижестоящие подразделения, может не быть
+
+	optional PositionId   head          = 21; // Начальник подразделения
+	repeated PositionId   positions     = 22; // Перечень должностей
+}
+
+// Структука подразделений
+message Departments {
+	required DepartmentId head        = 1;  // Корневое подразделение, фактически, синоним организации
+	repeated Department   departments = 2;  // Плоский список подразделений
+}
+
+// Идентификатор специальности, аналогично например ВУС
+message SpecialtyId {
+	required UUID value = 1;
+}
+
+// Специальность
+message Specialty {
+	required SpecialtyId specialty_id = 1;
+	required string      name = 2;
+	optional string      description = 3;
+}
+
+// Перечень специальностей
+message Specialties {
+	repeated Specialty specialties = 1;
+}
+
+// Описание огранизации
+message Organization {
+	required Employees   employees   = 1;  // люди
+	required Positions   positions   = 2;  // должности
+	required Departments departments = 3;  // подразделения
+	required Specialties specialties = 4;  // специальности
+}
+
+// Запрос ОШС
+message OrganizationRequest {
+
+}
+
+// Выдача ОШС
+message OrganizationResponse {
+	required Organization organization = 1;
+}
+
+// Сообщение об изменении в ОШС (формируется самой УШД, без запроса)
+message OrganizationIndication {
+	required Organization organization = 1;
+}
+
+

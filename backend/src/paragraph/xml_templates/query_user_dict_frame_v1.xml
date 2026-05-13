@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Пользовательские справочники" type="Запрос структуры пользовательских справочников" alias="query_user_dict_frame">
+
+	<group alias="version">
+		<!--Мажорная версия поднимается при потере обратной совместимости,
+			минорая - при любых изменениях-->
+		<spin_box name="Мажорная версия" alias="major" type="uint">0</spin_box>
+		<spin_box name="Минорная версия" alias="minor" type="uint">1</spin_box>
+	</group>
+	
+	<repeater alias="user_table_names" name="Названия запрашиваемых справочников">
+		<text_field name="Название справочника" alias="user_table_name" />
+	</repeater>
+	<start_state id = "initial" name="Отправлен">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Принят">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<repeater alias="user_table_frame" name="Структуры справочника(ов)">
+				<text_field name="Идентификатор" alias="ut_id_uuid" />
+				<text_field name="Идентификатор группы" alias="ut_parent_id_uuid" />
+				<text_field name="Имя" alias="ut_name" />
+				<spin_box name="Номер" alias="ut_counter" min="0" max="2147483647" step="1" />
+				<text_field name="*Имя в БД" alias="ut_name_real" />
+				<check_box name="Закреплен вкладкой" alias="ut_isShow" checked="false" />
+				<combo_box name="Доступ для пользователя" alias="ut_visible" type="standard" current="0">
+					<item>Редактор структуры и данных</item>
+					<item>Редактор данных</item>
+					<item>Только чтение</item>
+					<item>Отсутствует</item>
+				</combo_box>
+				<repeater alias="ut_column_frame" name="Структуры колонок">
+					<text_field name="Идентификатор" alias="utc_id_uuid" />
+					<text_field name="Имя" alias="utc_name" />
+					<combo_box name="Тип данных" alias="utc_type" type="standard" current="1">
+						<item>уникальный идентификатор</item>
+						<item>текстовое значение</item>
+						<item>текстовая область</item>
+						<item>целочисленное значение</item>
+						<item>дробное значение</item>
+						<item>дата/время</item>
+						<item>дата</item>
+						<item>флаг</item>
+						<item>ссылка</item>
+						<item>фигура на карте</item>
+						<item>маркер на карте</item>
+						<item>файл</item>
+						<item>обратная ссылка</item>
+						<item>параметры ИСЗ (TLE)</item>
+						<item>json</item>
+						<item>внешняя ссылка</item>
+					</combo_box>
+					<text_field name="Примечание" alias="utc_note" />
+					<spin_box name="Номер" alias="utc_order" min="0" max="2147483647" step="1" />
+					<text_field name="*Имя в БД" alias="utc_name_real" />
+					<text_field name="Связь" alias="utc_relation_uuid" />
+					<text_field name="Имя связи" alias="utc_relationName" />
+					<check_box name="Каскадное удаление связи" alias="utc_relationHard" checked="false" />
+				</repeater>
+			</repeater>
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>
+

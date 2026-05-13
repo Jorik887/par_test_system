@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paragraph-test-desktop-installer"
+version = "0.1.0"
+description = "Desktop launcher + installer wrapper for Paragraph Test Automation System"
+requires-python = ">=3.12"
+dependencies = [
+  "uvicorn[standard]>=0.30.0",
+  "pywebview>=5.1",
+]
+
+[tool.setuptools]
+py-modules = []
+

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Служебные" type="Уведомление о выполнении информационной задачи" alias="irz_notification">
+	<combo_box name="Событие" alias="event">
+		<!-- ИРЗ принят в работу -->
+		<item>Принято в работу</item>
+		<!-- Изменилось состояние выполнения ИРЗ -->
+		<item>Изменение состояния</item>
+		<!-- Ошибка во время выполнения ИРЗ. Текст ошибки заполнится в Примечание -->
+		<item>Ошибка</item>
+	</combo_box>
+	<!-- Процент выполнения ИРЗ -->
+	<spin_box name = "Процент выполнения" alias="progress" type="double" min="0" max="100"/>
+	<!-- Примечение, заполнение не обязательно -->
+	<text_field name="Примечание" alias="description"/>
+</document>
+

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Пользовательские справочники" type="Запрос метаинформации о пользовательском справочнике" alias="query_user_dict_metainfo">
+
+	<text_field name="Название/идентификатор справочника" alias="user_dict_name" required="true"></text_field>
+	
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<!--
+				1. Если полей ниже не существует, то они будут созданы;
+				2. Для dict_size рекомендуется добавлять параметр max=4294967295
+				   (в противном случае размер справочника будет урезаться до значения 100).
+			-->
+			<spin_box alias="dict_size" name="Текущий размер" type="uint" min="0" max="4294967295" />
+			<text_field alias="dict_name" name="Наименование"/>
+			<text_field alias="dict_id" name="Идентификатор"/>
+			<date alias="dict_last_modified" name="Дата и время последнего изменения" type="datetime" mask="dd.MM.yy HH:mm:ss" />
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>
+

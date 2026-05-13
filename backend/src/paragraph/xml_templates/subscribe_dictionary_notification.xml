@@ -1,0 +1,24 @@
+<document group="Пользовательские справочники" type="Подписка на уведомления" alias="subscribe_dictionary_notification" module="paragraf">
+
+<group alias="version">
+	<!--Мажорная версия поднимается при потере обратной совместимости,
+		минорая - при любых изменениях-->
+	<spin_box name="Мажорная версия" alias="major" type="uint">1</spin_box>
+	<spin_box name="Минорная версия" alias="minor" type="uint">0</spin_box>
+</group>
+	
+<text_field name="Наименование справочника" alias="user_table_name" required="true"/>
+
+<start_state id="initial" name="Принято">
+	<action button="Отправить ответ" state="done">
+		<text_field alias="info" name="Комментарий"/>
+	</action>
+	<action button="Отклонить" state="rejected">
+		<text_field alias="reason" name="Причина"/>
+	</action>
+</start_state>
+
+<final_state id="done" name="Завершено"/>
+<final_state id="rejected" name="Отклонено"/>
+
+</document>

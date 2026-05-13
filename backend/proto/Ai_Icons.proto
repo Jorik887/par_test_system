@@ -1,0 +1,99 @@
+syntax="proto2";
+package ai.proto;
+
+// Цвета стандартных иконок
+enum IconColor {
+	IC_BLUE   = 1;
+	IC_GRAY   = 2;
+	IC_GREEN  = 3;
+	IC_PURPLE = 4;
+	IC_RED    = 5;
+	IC_YELLOW = 6;
+}
+
+// Типы стандартных иконок
+enum IconType {
+// Геометрические фигуры
+	IT_CIRCLE          =   1;
+	IT_RING            =   2;
+	IT_RHOMBUS         =   3;
+	IT_SQUARE          =   4;
+	IT_TRIANGLE        =   5;
+
+// Плеер
+	IT_BACKWARD        = 101;
+	IT_FORWARD         = 102;
+	IT_PLAY            = 103;
+	IT_PAUSE           = 104;
+	IT_STOP            = 105;
+
+// Пользователи
+	IT_GROUP           = 201;
+	IT_OPERATOR        = 202;
+	IT_USER            = 203;
+
+// IT
+	IT_CLOUD           = 301;
+	IT_COMPUTER        = 302;
+	IT_DATABASE        = 303;
+	IT_DIRECTORY       = 304;
+	IT_FILE            = 305;
+	IT_LINK            = 306;
+	IT_MEMORYCARD      = 307;
+	IT_MONITOR         = 308;
+	IT_PRINTER         = 309;
+	IT_WEB             = 310;
+
+// Предметы
+	IT_MICROPHONE      = 401;
+	IT_SPEAKER         = 402;
+	IT_CAMERA          = 403;
+
+// Предметная область
+	IT_DF              = 501;
+	IT_HARDWARE        = 502;
+	IT_LOCATION        = 503;
+	IT_MAP             = 504;
+	IT_NETWORK         = 505;
+	IT_RADAR           = 506;
+	IT_WIRELESS        = 507;
+	IT_SPECTRUM        = 508;
+	IT_CALL            = 509;
+	IT_CALL_END        = 510;
+	IT_SMS             = 511;
+
+// Статусы
+	IT_INFO            = 601;
+	IT_WARNING         = 602;
+	IT_ERROR           = 603;
+	IT_REPORT          = 604;
+	IT_FLAG            = 605;
+	IT_BLOCK           = 606;
+}
+
+// Стандартная иконка
+message StandardIcon {
+	required IconColor color = 1;
+	required IconType  type  = 2;
+}
+
+// Пользовательская иконка
+message CustomIcon {
+	required string custom_file_id = 1; // Идентификатор графической иконки, зарегистрированной в конфигурационном файле подключаемого приложения
+}
+
+
+// Типы статусных иконок
+enum StatusIconType {
+	SIT_STANDARD = 1;
+	SIT_CUSTOM   = 2;
+}
+
+
+// Статусная иконка
+message StatusIcon {
+	required StatusIconType type          = 1;
+	required string         description   = 2;
+	optional StandardIcon   standard_icon = 3;
+	optional CustomIcon     custom_icon   = 4;
+}

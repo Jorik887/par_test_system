@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document group="Управляющие команды" type="Изменение состояния сервиса" alias="paragraf_service_manage">
+    <text_field name="Сервис" alias="service_name" required="true"/>
+	<combo_box name="Команда" alias="command">
+		<item>выключить</item>
+		<item>включить</item>
+	</combo_box>
+</document>

@@ -1,0 +1,40 @@
+<document group="Пользовательские справочники" type="Уведомление об изменении пользовательского справочника" alias="dictionary_notification" module="paragraf">
+
+	<text_field name="Название справочника" alias="user_table_name" required="true"/>	
+	<repeater alias="changed_records" name="Измененные записи">
+		<text_field name="Идентификатор записи" alias="column"></text_field>
+		<combo_box name="Тип изменения" alias="editing_type">
+			<item>Вставка</item>
+			<item>Обновление</item>
+			<item>Удаление</item>
+		</combo_box>
+		<!-- При вставке или обновлении приходят все столбцы из справочника. -->
+		<repeater alias="user_table_columns" name="Столбцы">
+			<!-- Значения полей хранятся в неформализованных параметрах, например:-->		
+			<text_field name="Наименование столбца" alias="column_name"></text_field>
+			
+			<!-- Для текстовых значений, уникальных идентификаторов и ссылок(ссылка - uuid строки): -->
+			<!-- <text_field name="Вариант значения" alias="text_val"></text_field> -->
+			
+			<!-- Для целочисленных значений: -->
+			<!-- <spin_box name="Наименование столбца" alias="int_val" type="int" min="0" max="100"></spin_box> -->
+
+			<!-- Для дробных значений: -->
+			<!-- <spin_box name="Наименование столбца" alias="double_val" type="double" min="0" max="100" step="0.1"></spin_box> -->
+			
+			<!-- Для времени и даты: -->
+			<!-- <date name="Наименование столбца" alias="datetime_val" type="datetime" /> -->
+			
+			<!-- Для флагов: -->
+			<!-- <check_box name="Наименование столбца" alias="check_val"></check_box> -->
+
+			<!-- Для фигур на карте: -->
+			<!-- <coordinates type="poi" name="Наименование столбца" alias="poi_val"></coordinates> -->
+			
+			<!-- Для файлов: -->
+			<!-- <input_file name="Наименование столбца" alias="file_val"></input_file> -->
+
+		</repeater>
+	</repeater>
+
+</document>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="Запрос файла" alias="documentfilesget"  module="paragraf">
+	<repeater alias="files_id" name="Идентификаторы файлов">
+		<text_field name="Идентификатор файла" alias="file_id" required="true"></text_field>
+	</repeater>
+	<start_state id = "initial" name="Принято">
+		<action button = "accept" state = "accepted" />
+	</start_state >
+	<state id="accepted" name="Выполняется">
+		<action button="fail" state="failed">
+			<text_field alias="reason" name="Сообщение"/>
+		</action>
+		<action button="complete" state="completed">
+			<repeater alias="files" name="Файлы">
+				<text_field name="Идентификатор файла" alias="file_id"></text_field>
+				<spin_box alias="hash" max="4294967295" min="0" name="Хеш параметра" type="uint" uitype="spinbox"/>
+				<binary_param alias="file" name="Сериализованный файл"/>
+			</repeater>
+		</action>
+	</state>
+	<final_state id="completed" name="Выполнено"/>
+	<final_state id="failed" name="Ошибка"/>
+</document>
+

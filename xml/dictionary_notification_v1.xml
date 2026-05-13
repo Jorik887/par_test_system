@@ -1,0 +1,39 @@
+<document group="Пользовательские справочники" type="Уведомление об изменении пользовательского справочника" alias="dictionary_notification_v1" module="paragraf">
+
+	<text_field name="Название справочника" alias="user_table_name" required="true"/>	
+	<repeater alias="changed_records" name="Измененные записи">
+		<text_field name="Идентификатор записи" alias="column"></text_field>
+		<combo_box name="Тип изменения" alias="editing_type">
+			<item>Вставка</item>
+			<item>Обновление</item>
+			<item>Удаление</item>
+		</combo_box>
+		<!-- Для операции «Вставка» передаются все столбцы новой строки.
+  		     Для «Обновление» – только те столбцы, чьи значения изменились.
+  		     Для «Удаление» передаются все столбцы. -->
+		<repeater alias="user_table_columns" name="Столбцы">
+			<!-- Значения полей хранятся в неформализованных параметрах, например:-->		
+			<text_field name="Наименование столбца" alias="column_name"></text_field>
+			<combo_box name="Тип колонки" alias="column_type">
+				<item>Текст</item>
+				<item>Дата/время</item>
+				<item>Логический тип</item>
+				<item>Целое число</item>
+				<item>Дробное число</item>
+				<item>Координата</item>
+				<item>Файл</item>
+			</combo_box>
+			<group alias="value">
+				<text_field name = "Текстовое значение" alias="text_val"/>
+				<date name = "Дата"  type="datetime" alias="date_val"/>
+				<check_box name="Логическое значение" alias="check_val" checked="false"></check_box>
+				<spin_box name = "Числовое значение" alias="spinbox_val" type="int" min="-2147483648" max="2147483647"/>
+				<spin_box name = "Дробное значение" alias="spinbox_doubleval" type="double" min="-4294967295" max="4294967295"/>
+				<coordinates name = "Координата" type="poi" alias="coordinates_val"/>
+				<input_file name="Файл" alias="file_val"/>
+			</group>
+
+		</repeater>
+	</repeater>
+
+</document>
